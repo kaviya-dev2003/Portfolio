@@ -80,14 +80,16 @@ const NavbarComponent = () => {
       <Hamburger onClick={() => setMenuOpen(!menuOpen)}>
         {menuOpen ? <FaTimes /> : <FaBars />}
       </Hamburger>
-      <NavMenu menuOpen={menuOpen}>
-        <NavItem href="#about">About</NavItem>
-        <NavItem href="#skills">Skills</NavItem>
-        <NavItem href="#visionary">Visionary</NavItem>
-        <NavItem href="#experience">Experience</NavItem>
-        <NavItem href="#projects">Projects</NavItem>
-        <NavItem href="#education">Education</NavItem>
-      </NavMenu>
+        <NavMenu menuOpen={menuOpen}>
+          <NavItem href="#about">About</NavItem>
+          <NavItem href="#skills">Skills</NavItem>
+          {/* <NavItem href="#visionary">Visionary</NavItem> */}
+          <NavItem href="#experience">Experience</NavItem>
+          <NavItem href="#projects">Projects</NavItem>
+          {/* <NavItem href="#education">Education</NavItem> */}
+        <NavItem href="#education">Contact</NavItem>
+
+        </NavMenu>
     </Navbar>
   );
 };

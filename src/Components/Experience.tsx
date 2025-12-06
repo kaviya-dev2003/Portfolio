@@ -9,6 +9,7 @@ const ExperienceSection = styled.section`
   position: relative;
   overflow: hidden;
 
+
   @media (max-width: 480px) {
     padding: 1rem 1rem;
   }
@@ -17,11 +18,13 @@ const ExperienceSection = styled.section`
 // 🔷 Title Box
 const TitleBox = styled.div`
   font-size: 3rem;
-  font-weight: 800;
-  margin: 0 auto 1rem auto;
-  text-align: center;
-  padding: 1rem 3rem;
+  margin-bottom: 2rem;
+  font-family: var(--primary-font);
   color: var(--sixth-color);
+  text-align: center;
+   font-weight: bold;
+ 
+
 
   @media (max-width: 480px) {
     font-size: 2rem;
@@ -31,11 +34,19 @@ const TitleBox = styled.div`
 
 // 🔷 Description
 const Description = styled.p`
-  font-size: 1.3rem;
-  font-family: var(--secondary-font);
+  // font-size: 1.5rem;
+  // font-family: var(--secondary-font);
+  // color: var(--fifth-color);
+  // text-align: center;
+  // margin-bottom: 3rem;
+
+  font-size: 1.5rem;
   color: var(--fifth-color);
-  text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+  font-family: var(--primary-font); 
+   text-align: center;
+      // font-weight: bold;
+  
 
   @media (max-width: 480px) {
     font-size: 1rem;
@@ -99,7 +110,7 @@ const ExperienceCard = styled.div`
 
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  // gap: 1.2rem;
   text-align: left;
 
   position: relative;
@@ -143,12 +154,16 @@ const Company = styled.h3`
 
 const Role = styled.p`
   font-family: var(--secondary-font);
-  color: #ffffff;
+ color: var(--third-color);
+   margin-top: 0.5rem;
+   font-weight: bold;
 `;
 
 const Duration = styled.p`
   font-family: var(--secondary-font);
-  color: #ffffff;
+  color: var(--third-color);
+
+  
 `;
 
 // 🔷 Background Shapes
@@ -213,6 +228,7 @@ const ShapeThree = styled.div`
 
 const ExperienceComponent = () => {
   return (
+    <section id="experience">
     <ExperienceSection>
       <ShapeOne />
       <ShapeTwo />
@@ -237,6 +253,7 @@ const ExperienceComponent = () => {
         </ExperienceCard>
       </CardsContainer>
     </ExperienceSection>
+    </section>
   );
 };
 

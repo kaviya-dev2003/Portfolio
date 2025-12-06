@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useState } from "react";
 
 // 🔷 Modern Contact Section (Dark + Unique Shapes)
 
@@ -16,9 +17,13 @@ const ContactSection = styled.section`
 
 const Title = styled.h1`
   font-size: 3rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   font-family: var(--primary-font);
-  letter-spacing: 1px;
+  color: var(--sixth-color);
+    @media (max-width: 480px) {
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+  }
 `;
 
 const ContactCard = styled.div`
@@ -111,19 +116,22 @@ const ShapeOne = styled.div`
   border-radius: 50% 20% 50% 80%;
   transform: rotate(45deg);
   filter: blur(20px);
+  
 `;
 
 const ShapeTwo = styled.div`
   position: absolute;
   width: 200px;
-  height: 120px;
+  height: 200px;
   background: var(--third-color);
   opacity: 0.2;
   bottom: 10%;
-  left: 25%;
-  border-radius: 30% 60% 70% 40%;
+  left: 10%;
+  border-radius: 30% 20% 20% 40%;
   transform: rotate(-25deg);
   filter: blur(18px);
+
+  }
 `;
 
 const ShapeThree = styled.div`
@@ -131,32 +139,112 @@ const ShapeThree = styled.div`
   width: 120px;
   height: 220px;
   background: var(--fourth-color);
-  opacity: 0.3;
+  opacity: 0.2;
   top: 40%;
-  left: 65%;
-  border-radius: 50% 30% 60% 20%;
+  left: 85%;
+  border-radius: 10% 10% 10% 10%;
   transform: rotate(60deg);
   filter: blur(22px);
 `;
 
+// const ContactComponent = () => {
+//   return (
+//     <section id="contact">
+//     <ContactSection>
+//       <ShapeOne />
+//       <ShapeTwo />
+//       <ShapeThree />
+
+//       <Title>Contact Me</Title>
+
+//       <ContactCard>
+//         <Form>
+//           <Input type="text" placeholder="Your Name" required />
+//           <Input type="email" placeholder="Your Email" required />
+//           <Textarea rows={5} placeholder="Your Message" required />
+//           <Button type="submit">Send Message</Button>
+//         </Form>
+//       </ContactCard>
+//     </ContactSection>
+//     </section>
+//   );
+// };
+
+// export default ContactComponent;
+
+
+
 const ContactComponent = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    socialMedia: "",
+    message: "",
+  });
+
+  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+
+    const response = await fetch("http://localhost:5000/api/form/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+    alert(data.message);
+  };
+
   return (
-    <ContactSection>
-      <ShapeOne />
-      <ShapeTwo />
-      <ShapeThree />
+    <section id="contact">
+      <ContactSection>
+        <ShapeOne />
+        <ShapeTwo />
+        <ShapeThree />
 
-      <Title>Contact Me</Title>
+        <Title>Contact Me</Title>
 
-      <ContactCard>
-        <Form>
-          <Input type="text" placeholder="Your Name" required />
-          <Input type="email" placeholder="Your Email" required />
-          <Textarea rows={5} placeholder="Your Message" required />
-          <Button type="submit">Send Message</Button>
-        </Form>
-      </ContactCard>
-    </ContactSection>
+        <ContactCard>
+          <Form onSubmit={handleSubmit}>
+            <Input
+              type="text"
+              name="name"
+              placeholder="Your Name"
+              required
+              onChange={handleChange}
+            />
+            <Input
+              type="email"
+              name="email"
+              placeholder="Your Email"
+              required
+              onChange={handleChange}
+            />
+            <Input
+              type="text"
+              name="socialMedia"
+              placeholder="Your Social Media (Optional)"
+              onChange={handleChange}
+            />
+            <Textarea
+              name="message"
+              rows={5}
+              placeholder="Your Message"
+              required
+              onChange={handleChange}
+            />
+            <Button type="submit">Send Message</Button>
+          </Form>
+        </ContactCard>
+      </ContactSection>
+    </section>
   );
 };
 

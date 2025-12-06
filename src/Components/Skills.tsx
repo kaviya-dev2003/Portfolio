@@ -44,14 +44,18 @@ const Title = styled.h1`
   margin-bottom: 2rem;
   font-family: var(--primary-font);
   color: var(--sixth-color);
+
+   @media (max-width: 480px) {
+    font-size: 2rem;
+  }
 `;
 
 const Title2 = styled.h2`
   font-size: 1.4rem;
   color: var(--third-color);
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   font-family: var(--primary-font);
-  text-transform: uppercase;
+  // text-transform: uppercase;
 `;
 
 const SkillsContainer = styled.div`
@@ -87,13 +91,14 @@ const SkillList = styled.ul`
 const SkillItem = styled.li`
   padding: 0.5rem 1rem;
   background-color: var(--second-color);
-  color: var(--fifth-color);
+  color: var(--sixth-color);
   border-radius: 12px;
   margin: 0.3rem;
 `;
 
 const SkillsComponent = () => {
   return (
+    <section id="skills">
     <SkillsSection>
       <Title>My Skills</Title>
       <SkillsContainer>
@@ -143,6 +148,7 @@ const SkillsComponent = () => {
         </StackBox>
       </SkillsContainer>
     </SkillsSection>
+    </section>
   );
 };
 

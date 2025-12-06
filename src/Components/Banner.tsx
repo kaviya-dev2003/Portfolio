@@ -160,6 +160,7 @@ const StyledShape = styled.div`
 
 const Banner = () => {
   return (
+    <section id="about">
     <HeroSection>
       <StyledShape />
       <Content>
@@ -178,6 +179,7 @@ const Banner = () => {
         <img src={Kaviya} alt="Kaviya" />
       </ImageWrapper>
     </HeroSection>
+    </section>
   );
 };
 

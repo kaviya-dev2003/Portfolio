@@ -2,6 +2,12 @@
 
 import styled from "styled-components";
 import { motion } from "framer-motion";
+import portfolioImg from "../Images/Portfolio.png";
+import AdaptoWeb from "../Images/AdaptoWeb.png";
+import Ecommerce from "../Images/Ecommerce.png";
+import Quiz from "../Images/Quiz.png";
+import QuizJava from "../Images/QuizJava.png";
+
 
 const ProjectsSection = styled.section`
   background: var(--first-color);
@@ -79,11 +85,10 @@ const ShapeThree = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: 3rem;
-  margin-bottom: 3rem;
+ font-size: 3rem;
+  margin-bottom: 2rem;
   font-family: var(--primary-font);
-  letter-spacing: 1px;
-  z-index: 4;
+  color: var(--sixth-color);
 
   @media (max-width: 480px) {
     font-size: 2.2rem;
@@ -136,6 +141,7 @@ const ProjectImage = styled.img`
 const ProjectTitle = styled.h3`
   font-size: 1.5rem;
   font-family: var(--primary-font);
+   color: var(--third-color);
 
   @media (max-width: 480px) {
     font-size: 1.2rem;
@@ -146,6 +152,7 @@ const Tech = styled.p`
   font-size: 0.95rem;
   opacity: 0.9;
   font-family: var(--primary-font);
+   color: var(--fifth-color);
 
   @media (max-width: 480px) {
     font-size: 0.85rem;
@@ -187,25 +194,31 @@ const LearnMore = styled.a`
 const ProjectsComponent = () => {
   const projects = [
     {
-      image: "/images/portfolio.png",
+      image: portfolioImg,
       title: "Personal Portfolio Website",
       technologies: "React, Styled-components",
       description: "A modern, highly responsive portfolio showcasing my journey and skills.",
     },
     {
-      image: "/images/ecommerce.png",
+      image: AdaptoWeb,
       title: "E-commerce Application",
       technologies: "MERN Stack",
       description: "A complete online shopping experience with authentication and product control.",
     },
     {
-      image: "/images/automation.png",
+      image: Ecommerce,
       title: "Selenium Automation Framework",
       technologies: "Selenium, Java",
       description: "Advanced automation framework with reusable modules and reporting.",
     },
     {
-      image: "/images/wordpress.png",
+      image: Quiz,
+      title: "WordPress Blog Website",
+      technologies: "WordPress, SEO",
+      description: "SEO-optimized WordPress blog with structured design and performance focus.",
+    },
+    {
+      image: QuizJava,
       title: "WordPress Blog Website",
       technologies: "WordPress, SEO",
       description: "SEO-optimized WordPress blog with structured design and performance focus.",
@@ -213,6 +226,7 @@ const ProjectsComponent = () => {
   ];
 
   return (
+    <section id="projects">
     <ProjectsSection>
       <ShapeOne />
       <ShapeTwo />
@@ -232,6 +246,7 @@ const ProjectsComponent = () => {
         ))}
       </ProjectsGrid>
     </ProjectsSection>
+    </section>
   );
 };
 

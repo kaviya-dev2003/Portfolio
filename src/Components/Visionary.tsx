@@ -2,10 +2,15 @@ import styled from "styled-components";
 
 // Custom styled components for the tags
 const CustomTitle = styled.div`
-  font-size: 2rem;
+//  font-size: 2rem;
+//   margin-bottom: 2rem;
+//   font-family: var(--primary-font);
+//   color: var(--third-color);
+ font-size: 2rem;
+  color: var(--third-color);
+  margin-bottom: 2rem;
+  font-family: var(--primary-font);
   font-weight: bold;
-  margin-bottom: 1rem;
-  color: var(--sixth-color);
 
   @media (max-width: 480px) {
     font-size: 1.4rem;
@@ -13,8 +18,8 @@ const CustomTitle = styled.div`
 `;
 
 const CustomParagraph = styled.div`
-  font-size: 1rem;
-  color: var(--fifth-color);
+  font-size: 1.2rem;
+  color: var(--sixth-color);
 
   @media (max-width: 480px) {
     font-size: 0.9rem;
@@ -87,6 +92,7 @@ const Title = styled.h1`
   margin-bottom: 2rem;
   font-family: var(--primary-font);
   color: var(--sixth-color);
+ 
 
   @media (max-width: 480px) {
     font-size: 2rem;
@@ -94,10 +100,11 @@ const Title = styled.h1`
 `;
 
 const Subheading = styled.h2`
-  font-size: 1.8rem;
-  color: var(--third-color);
+  font-size: 1.5rem;
+  color: var(--fifth-color);
   margin-bottom: 2rem;
   font-family: var(--primary-font);
+   font-weight: normal;
 
   @media (max-width: 480px) {
     font-size: 1.2rem;
@@ -141,6 +148,7 @@ const Box = styled.div`
 
 const VisionaryComponent = () => {
   return (
+    <section id="visionary">
     <VisionarySection>
       <Title>Visionary</Title>
       <Subheading>
@@ -164,6 +172,7 @@ const VisionaryComponent = () => {
       </BoxContainer>
       <StyledShape />
     </VisionarySection>
+    </section>
   );
 };
 

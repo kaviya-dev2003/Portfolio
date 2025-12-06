@@ -1,4 +1,5 @@
-import { BrowserRouter as Router } from "react-router-dom";
+// import { BrowserRouter as Router } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import NavbarComponent from "./Components/Navbar";
 import Banner from "./Components/Banner";
 import Skills from "./Components/Skills";
@@ -11,7 +12,7 @@ import Experience from "./Components/Experience";
 
 function App() {
   return (
-    <Router>
+    <HashRouter>
       <NavbarComponent />
       <Banner />
       <Skills />
@@ -21,7 +22,7 @@ function App() {
       <Education />
       <Contact />
       <Footer />
-    </Router>
+    </HashRouter>
   );
 }
 

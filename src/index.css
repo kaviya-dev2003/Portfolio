@@ -25,3 +25,8 @@ body {
   background-color: var(--first-color);
   color: var(--sixth-color);
 }
+
+
+html {
+  scroll-behavior: smooth;
+}

@@ -16,9 +16,14 @@ const EducationSection = styled.section`
 // 🔷 Title
 const Title = styled.h1`
   font-size: 3rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   font-family: var(--primary-font);
-  letter-spacing: 1px;
+  color: var(--sixth-color);
+
+    @media (max-width: 480px) {
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+  }
 `;
 
 // 🔷 Education Card
@@ -118,23 +123,23 @@ const RoadmapLine = styled.div`
 
 // 🔷 Text inside card
 const Degree = styled.h3`
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-family: var(--primary-font);
   margin-bottom: 0.7rem;
-  color: var(--sixth-color);
+  color: var(--third-color);
 `;
 
 const Institution = styled.p`
   font-family: var(--secondary-font);
   font-size: 1.1rem;
-  color: var(--fifth-color);
+  color: var(--sixth-color);
   font-weight: bold;
 `;
 
 const Duration = styled.p`
   margin-top: 0.5rem;
   font-family: var(--secondary-font);
-  color: var(--fourth-color);
+  color: var(--sixth-color);
   font-weight: 600;
 `;
 
@@ -192,6 +197,7 @@ const EducationComponent = () => {
   ];
 
   return (
+    <section id="education">
     <EducationSection>
       <ShapeOne />
       <ShapeTwo />
@@ -209,6 +215,7 @@ const EducationComponent = () => {
       ))}
 
     </EducationSection>
+    </section>
   );
 };
 
