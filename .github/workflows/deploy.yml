@@ -37,10 +37,12 @@ jobs:
           node-version: 18
           cache: 'npm'
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --no-audit
       - name: Build
         run: |
-          npm run build
+          echo "Listing source files for debugging:"
+          ls -R src
+          npm run build --verbose
         env:
           CI: false
       - name: Setup Pages
