@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { Button } from "../../components";
+import { Button, Toast } from "../../components";
 import { theme } from "../../styles/theme";
 import { slideUp, staggerContainer } from "../../animations/motionVariants";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = styled.section`
   height: calc(100vh - 80px);
@@ -51,10 +52,35 @@ const Description = styled(motion.p)`
 
 const ButtonGroup = styled(motion.div)`
   display: flex;
+  flex-direction: column;
   gap: 1.5rem;
+  align-items: flex-start;
   
   @media (max-width: 768px) {
-    justify-content: center;
+    align-items: center;
+  }
+`;
+
+const PrimaryActions = styled.div`
+  display: flex;
+  gap: 1.5rem;
+`;
+
+const ViewResumeLink = styled(motion.button)`
+  background: none;
+  border: none;
+  color: ${theme.colors.muted};
+  font-family: ${theme.fonts.subheadings};
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 0.5rem;
+  transition: ${theme.transitions.standard};
+
+  &:hover {
+    color: ${theme.colors.accent};
   }
 `;
 
@@ -96,6 +122,26 @@ const AbstractShape = styled.div`
 `;
 
 const Home: React.FC = () => {
+  const navigate = useNavigate();
+  const [showToast, setShowToast] = useState(false);
+
+  const handleDownloadResume = () => {
+    // Direct download logic
+    const link = document.createElement("a");
+    link.href = `${process.env.PUBLIC_URL}/resume.pdf`;
+    link.download = "Kaviya_Venkatesh_Resume.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Tracking (localStorage)
+    const count = parseInt(localStorage.getItem("resume_downloads") || "0");
+    localStorage.setItem("resume_downloads", (count + 1).toString());
+
+    // Feedback
+    setShowToast(true);
+  };
+
   return (
     <HeroSection>
       <HeroContent
@@ -109,8 +155,13 @@ const Home: React.FC = () => {
           Crafting scalable, elegant, and user-centric web solutions with a focus on performance and modern design principles.
         </Description>
         <ButtonGroup variants={slideUp}>
-          <Button variant="primary" onClick={() => window.location.href = '#/projects'}>View Projects</Button>
-          <Button variant="outline">Download Resume</Button>
+          <PrimaryActions>
+            <Button variant="primary" onClick={() => navigate('/projects')}>View Projects</Button>
+            <Button variant="outline" onClick={handleDownloadResume}>Download Resume</Button>
+          </PrimaryActions>
+          <ViewResumeLink onClick={() => navigate('/resume')}>
+            Or view resume in browser
+          </ViewResumeLink>
         </ButtonGroup>
       </HeroContent>
       <HeroImageWrapper
@@ -120,6 +171,12 @@ const Home: React.FC = () => {
       >
         <AbstractShape />
       </HeroImageWrapper>
+
+      <Toast
+        isVisible={showToast}
+        message="Resume downloaded successfully!"
+        onClose={() => setShowToast(false)}
+      />
     </HeroSection>
   );
 };

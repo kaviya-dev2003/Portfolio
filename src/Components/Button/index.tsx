@@ -59,13 +59,18 @@ const BaseButton = styled.button<ButtonProps>`
 
 const MotionButton = motion(BaseButton);
 
-const Button: React.FC<ButtonProps & HTMLMotionProps<"button">> = ({ children, ...props }) => {
+const Button: React.FC<ButtonProps & HTMLMotionProps<"button">> = ({ children, variant = "primary", size = "medium", ...props }) => {
     return (
         <MotionButton
             {...(props as any)}
-            whileHover="hover"
-            whileTap="tap"
-            variants={buttonHover}
+            variant={variant}
+            size={size}
+            whileHover={{
+                y: -2,
+                boxShadow: "0 10px 20px rgba(15, 23, 42, 0.1)",
+                transition: { duration: 0.2 }
+            }}
+            whileTap={{ scale: 0.98 }}
         >
             {children}
         </MotionButton>

@@ -5,6 +5,7 @@ import About from "../pages/About";
 import Projects from "../pages/Projects";
 import ProjectDetails from "../pages/ProjectDetails";
 import Contact from "../pages/Contact";
+import Resume from "../pages/Resume";
 
 const AppRoutes: React.FC = () => {
     return (
@@ -14,6 +15,7 @@ const AppRoutes: React.FC = () => {
             <Route path="/projects" element={<Projects />} />
             <Route path="/projects/:projectId" element={<ProjectDetails />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/resume" element={<Resume />} />
             {/* Fallback route */}
             <Route path="*" element={<Home />} />
         </Routes>
