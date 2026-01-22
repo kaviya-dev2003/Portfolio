@@ -26,7 +26,8 @@ export const handleFormSubmission = async (req: Request, res: Response) => {
     console.error(`[Form] Request ${requestId} failed:`, error.message || error);
     
     if (error.message === "Database operation timed out") {
-      return res.status(504).json({ message: "Database is taking too long to respond. Please try again later." });
+      res.status(504).json({ message: "Database is taking too long to respond. Please try again later." });
+      return;
     }
     
     res.status(500).json({ message: "Error submitting form", error: error.message || error });
