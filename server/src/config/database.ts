@@ -3,30 +3,24 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const getDbConfig = () => {
-  if (process.env.MYSQL_URL) {
-    return process.env.MYSQL_URL;
-  }
-  
-  return {
-    host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
-    user: process.env.MYSQLUSER || process.env.DB_USER || "root",
-    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
-    database: process.env.MYSQLDATABASE || process.env.DB_NAME || "portfolio",
-    port: parseInt(process.env.MYSQLPORT || "3306"),
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    connectTimeout: 10000,
-    enableKeepAlive: true,
-    keepAliveInitialDelay: 10000,
-  };
-};
+// ✅ Create the pool using either the URL or the individual config
+export const pool = process.env.MYSQL_URL 
+  ? mysql.createPool(process.env.MYSQL_URL) 
+  : mysql.createPool({
+      host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
+      user: process.env.MYSQLUSER || process.env.DB_USER || "root",
+      password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
+      database: process.env.MYSQLDATABASE || process.env.DB_NAME || "portfolio",
+      port: parseInt(process.env.MYSQLPORT || "3306"),
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+      connectTimeout: 10000,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 10000,
+    });
 
-const dbConfig = getDbConfig();
-console.log(`[DB] Initializing pool with: ${typeof dbConfig === 'string' ? 'MYSQL_URL' : 'Config Object'}`);
-
-export const pool = mysql.createPool(dbConfig);
+console.log(`[DB] Initializing pool with: ${process.env.MYSQL_URL ? 'MYSQL_URL' : 'Config Object'}`);
 
 export const connectToDB = async () => {
   try {
