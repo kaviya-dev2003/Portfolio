@@ -12,6 +12,11 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// ✅ Health check
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok", uptime: process.uptime() });
+});
+
 // ✅ API routes
 app.use("/api/form", formRoutes);
 
