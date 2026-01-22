@@ -9,7 +9,8 @@
     "start:client": "cd client && npm start",
     "start:server": "cd server && npm run dev",
     "start:all": "npx concurrently \"npm run start:client\" \"npm run start:server\"",
-    "build:client": "cd client && npm run build"
+    "build:client": "cd client && npm run build",
+    "deploy:client": "cd client && npm run deploy"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
