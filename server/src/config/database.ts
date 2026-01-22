@@ -3,22 +3,35 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// ✅ Create the pool using either the URL or the individual config
-export const pool = process.env.MYSQL_URL 
-  ? mysql.createPool(process.env.MYSQL_URL) 
-  : mysql.createPool({
-      host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
-      user: process.env.MYSQLUSER || process.env.DB_USER || "root",
-      password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
-      database: process.env.MYSQLDATABASE || process.env.DB_NAME || "portfolio",
-      port: parseInt(process.env.MYSQLPORT || "3306"),
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-      connectTimeout: 10000,
-      enableKeepAlive: true,
-      keepAliveInitialDelay: 10000,
-    });
+/**
+ * DB CONFIGURATION - ANTIGRAVITY FIX V3
+ * This version uses explicit separate calls to createPool to satisfy TypeScript overloads.
+ */
+
+// 1. Define the pool variable first
+let poolInstance: mysql.Pool;
+
+if (process.env.MYSQL_URL) {
+  // Use URI string overload
+  poolInstance = mysql.createPool(process.env.MYSQL_URL);
+} else {
+  // Use PoolOptions object overload
+  poolInstance = mysql.createPool({
+    host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
+    user: process.env.MYSQLUSER || process.env.DB_USER || "root",
+    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
+    database: process.env.MYSQLDATABASE || process.env.DB_NAME || "portfolio",
+    port: parseInt(process.env.MYSQLPORT || "3306"),
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    connectTimeout: 10000,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000,
+  });
+}
+
+export const pool = poolInstance;
 
 console.log(`[DB] Initializing pool with: ${process.env.MYSQL_URL ? 'MYSQL_URL' : 'Config Object'}`);
 
@@ -45,7 +58,6 @@ export const connectToDB = async () => {
     try {
       await connection.query("ALTER TABLE portfolio ADD COLUMN IF NOT EXISTS socialMedia VARCHAR(255) AFTER email");
     } catch (e) {
-      // Fallback for MySQL versions that don't support ADD COLUMN IF NOT EXISTS
       console.log("socialMedia column check/add attempted");
     }
 
@@ -54,6 +66,5 @@ export const connectToDB = async () => {
     connection.release();
   } catch (error) {
     console.error("MySQL connection failed:", error);
-    // process.exit(1); // 👈 Removed to prevent Railway boot loops
   }
 };

@@ -7,10 +7,19 @@ exports.connectToDB = exports.pool = void 0;
 const promise_1 = __importDefault(require("mysql2/promise"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-// ✅ Create the pool using either the URL or the individual config
-exports.pool = process.env.MYSQL_URL
-    ? promise_1.default.createPool(process.env.MYSQL_URL)
-    : promise_1.default.createPool({
+/**
+ * DB CONFIGURATION - ANTIGRAVITY FIX V3
+ * This version uses explicit separate calls to createPool to satisfy TypeScript overloads.
+ */
+// 1. Define the pool variable first
+let poolInstance;
+if (process.env.MYSQL_URL) {
+    // Use URI string overload
+    poolInstance = promise_1.default.createPool(process.env.MYSQL_URL);
+}
+else {
+    // Use PoolOptions object overload
+    poolInstance = promise_1.default.createPool({
         host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
         user: process.env.MYSQLUSER || process.env.DB_USER || "root",
         password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
@@ -23,6 +32,8 @@ exports.pool = process.env.MYSQL_URL
         enableKeepAlive: true,
         keepAliveInitialDelay: 10000,
     });
+}
+exports.pool = poolInstance;
 console.log(`[DB] Initializing pool with: ${process.env.MYSQL_URL ? 'MYSQL_URL' : 'Config Object'}`);
 const connectToDB = async () => {
     try {
@@ -46,7 +57,6 @@ const connectToDB = async () => {
             await connection.query("ALTER TABLE portfolio ADD COLUMN IF NOT EXISTS socialMedia VARCHAR(255) AFTER email");
         }
         catch (e) {
-            // Fallback for MySQL versions that don't support ADD COLUMN IF NOT EXISTS
             console.log("socialMedia column check/add attempted");
         }
         console.log("Portfolio table verified/created");
@@ -54,7 +64,6 @@ const connectToDB = async () => {
     }
     catch (error) {
         console.error("MySQL connection failed:", error);
-        // process.exit(1); // 👈 Removed to prevent Railway boot loops
     }
 };
 exports.connectToDB = connectToDB;
