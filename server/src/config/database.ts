@@ -3,28 +3,35 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const host = process.env.MYSQLHOST || process.env.DB_HOST || "localhost";
-console.log(`[DB] Attempting connection to host: ${host}`);
+const getDbConfig = () => {
+  if (process.env.MYSQL_URL) {
+    return process.env.MYSQL_URL;
+  }
+  
+  return {
+    host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
+    user: process.env.MYSQLUSER || process.env.DB_USER || "root",
+    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
+    database: process.env.MYSQLDATABASE || process.env.DB_NAME || "portfolio",
+    port: parseInt(process.env.MYSQLPORT || "3306"),
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    connectTimeout: 10000,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000,
+  };
+};
 
-export const pool = mysql.createPool({
-  uri: process.env.MYSQL_URL, // 👈 Railway's modern way
-  host: !process.env.MYSQL_URL ? host : undefined,
-  user: !process.env.MYSQL_URL ? (process.env.MYSQLUSER || process.env.DB_USER || "root") : undefined,
-  password: !process.env.MYSQL_URL ? (process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "") : undefined,
-  database: !process.env.MYSQL_URL ? (process.env.MYSQLDATABASE || process.env.DB_NAME || "portfolio") : undefined,
-  port: !process.env.MYSQL_URL ? parseInt(process.env.MYSQLPORT || "3306") : undefined,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  connectTimeout: 10000, 
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 10000,
-});
+const dbConfig = getDbConfig();
+console.log(`[DB] Initializing pool with: ${typeof dbConfig === 'string' ? 'MYSQL_URL' : 'Config Object'}`);
+
+export const pool = mysql.createPool(dbConfig);
 
 export const connectToDB = async () => {
   try {
     const connection = await pool.getConnection();
-    console.log("MySQL Connected");
+    console.log("MySQL Connected Successfully");
 
     // Automatically create table if it doesn't exist
     const createTableQuery = `
