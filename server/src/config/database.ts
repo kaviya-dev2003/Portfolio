@@ -3,16 +3,20 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const host = process.env.MYSQLHOST || process.env.DB_HOST || "localhost";
+console.log(`[DB] Attempting connection to host: ${host}`);
+
 export const pool = mysql.createPool({
-  host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
-  user: process.env.MYSQLUSER || process.env.DB_USER || "root",
-  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
-  database: process.env.MYSQLDATABASE || process.env.DB_NAME || "portfolio",
-  port: parseInt(process.env.MYSQLPORT || "3306"),
+  uri: process.env.MYSQL_URL, // 👈 Railway's modern way
+  host: !process.env.MYSQL_URL ? host : undefined,
+  user: !process.env.MYSQL_URL ? (process.env.MYSQLUSER || process.env.DB_USER || "root") : undefined,
+  password: !process.env.MYSQL_URL ? (process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "") : undefined,
+  database: !process.env.MYSQL_URL ? (process.env.MYSQLDATABASE || process.env.DB_NAME || "portfolio") : undefined,
+  port: !process.env.MYSQL_URL ? parseInt(process.env.MYSQLPORT || "3306") : undefined,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  connectTimeout: 10000, // 10 seconds timeout
+  connectTimeout: 10000, 
   enableKeepAlive: true,
   keepAliveInitialDelay: 10000,
 });
