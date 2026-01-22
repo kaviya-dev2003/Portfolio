@@ -8,14 +8,33 @@ import PortfolioImg from "../../assets/images/Portfolio.png";
 import EcommerceImg from "../../assets/images/Ecommerce.png";
 import AdaptoWebImg from "../../assets/images/AdaptoWeb.png";
 import QuizImg from "../../assets/images/Quiz.png";
+import QuizJavaImg from "../../assets/images/QuizJava.png";
+import ConvertlyImg from "../../assets/images/Convertly.png";
+import EventImg from "../../assets/images/EventNexus.png";
+import ToForeverImg from "../../assets/images/ToMyForever.png";
+import VoidImg from "../../assets/images/Void.png";
+import WaitlestImg from "../../assets/images/WaitlistWebsites.png";
+import ClientFlowImg from "../../assets/images/ClientFlow.png";
+
+
+
+
 
 const Container = styled.section`
-  padding: 8rem 10%;
+  padding: 5rem 10%;
+  
+  @media (max-width: 768px) {
+    padding: 4rem 10% 8rem;
+  }
 `;
 
 const Header = styled(motion.div)`
   margin-bottom: 5rem;
   text-align: center;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 3rem;
+  }
 `;
 
 const Title = styled.h2`
@@ -99,31 +118,76 @@ const ViewLink = styled(Link)`
 
 const Projects: React.FC = () => {
   const projectList = [
+
     {
-      id: "personal-portfolio",
-      title: "Premium Portfolio Website",
-      tech: "React, Styled-Components, Express, MySql",
-      image: PortfolioImg
+      id: "event-nexus",
+      title: "Event Nexus 🎉",
+      tech: "React.js, Node.js, Express.js, MySQL",
+      image: EventImg
     },
     {
-      id: "ecommerce-app",
-      title: "Enterprise E-commerce Platform",
-      tech: "Next.js, Node.js, Stripe, MongoDB",
-      image: EcommerceImg
+      id: "convertly",
+      title: "Convertly 📩",
+      tech: "React.js, Node.js, Express.js, MySQL",
+      image: ConvertlyImg
     },
     {
-      id: "selenium-framework",
-      title: "Automation Testing Framework",
-      tech: "Java, Selenium, TestNG, Jenkins",
+      id: "waitlist-website",
+      title: "Waitlist Website 📝",
+      tech: "React.js, Vite, Bootstrap 5, CSS",
+      image: WaitlestImg
+    },
+    {
+      id: "void-studio",
+      title: "VOID Studio Website 🎨",
+      tech: "HTML, CSS",
+      image: VoidImg
+    },
+    {
+      id: "to-my-forever",
+      title: "To My Forever 💖",
+      tech: "HTML, CSS",
+      image: ToForeverImg
+    },
+    {
+      id: "clientflow",
+      title: "CLIENTFLOW 💼",
+      tech: "Laravel, MySQL, Blade, Bootstrap 5, CSS",
+      image: ClientFlowImg
+    },
+    {
+      id: "solestyle",
+      title: "SoleStyle 👟",
+      tech: "HTML, CSS",
       image: AdaptoWebImg
     },
     {
-      id: "wordpress-blog",
-      title: "Modern Content Engine",
-      tech: "WordPress, PHP, SEO Optimization",
+      id: "sweetcravings",
+      title: "SweetCravings 🍰",
+      tech: "HTML, CSS, JavaScript",
+      image: EcommerceImg
+    },
+    {
+      id: "quizmaster",
+      title: "QuizMaster 🎓",
+      tech: "Core Java",
       image: QuizImg
+    },
+    {
+      id: "timebound-quiz",
+      title: "TimeBound Quiz System ⏱️",
+      tech: "Core Java, JSP, Servlets",
+      image: QuizJavaImg
+    },
+    {
+      id: "portfolio",
+      title: "Portfolio 💖",
+      tech: "React.js, Express.js, Vite, Bootstrap 5, CSS",
+      image: PortfolioImg
     }
+
   ];
+
 
   return (
     <Container>
@@ -139,11 +203,11 @@ const Projects: React.FC = () => {
       >
         {projectList.map((project) => (
           <ProjectCard key={project.id} variants={slideUp}>
-            <div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden' }}>
+            <div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', background: theme.colors.secondary }}>
               <img
                 src={project.image}
                 alt={project.title}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'transform 0.5s ease' }}
                 onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                 onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
               />

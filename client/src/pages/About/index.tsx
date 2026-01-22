@@ -5,7 +5,11 @@ import { theme } from "../../styles/theme";
 import { slideUp, staggerContainer } from "../../animations/motionVariants";
 
 const Container = styled.section`
-  padding: 8rem 10%;
+  padding: 5rem 10%;
+  
+  @media (max-width: 768px) {
+    padding: 4rem 10% 8rem;
+  }
 `;
 
 const Header = styled(motion.div)`
@@ -113,25 +117,29 @@ const TimelineCompany = styled.h4`
 
 const About: React.FC = () => {
   const skills = {
-    Frontend: ["React.js", "TypeScript", "Styled-components", "Framer Motion", "Tailwind CSS"],
-    Backend: ["Node.js", "Express", "MySQL", "PHP (XAMPP)", "Java"],
-    Tools: ["Git", "Docker", "AWS", "Figma", "Selenium"]
+    Frontend: ["HTML", "CSS", "JavaScript", "React", "Bootstrap"],
+    Backend: ["Node.js", "Express", "Laravel", "Java", "Spring Boot", "Hibernate"],
+    Database: ["MySQL", "MongoDB"],
+    Tools: ["Git", "GitHub", "VS Code", "Postman"],
+    Other: ["WordPress", "SAP-ABAP"]
   };
+
 
   const experiences = [
     {
-      year: "2023 - Present",
-      role: "Full Stack Developer",
-      company: "Freelance / Projects",
-      desc: "Developing end-to-end web applications for various clients, focusing on scalability and user experience."
+      year: "",
+      role: "Backend Developer",
+      company: "Nulinz Technology, Salem",
+      desc: "Built scalable backend systems including export workflows, commerce platforms, logistics, and warehouse management."
     },
     {
-      year: "2022 - 2023",
-      role: "Junior Web Developer",
-      company: "Internship",
-      desc: "Contributed to frontend development of enterprise-level dashboards and API integrations."
+      year: "",
+      role: "Full Stack Developer Intern",
+      company: "ES EthicSecur SofTec, Salem",
+      desc: "Developed responsive websites and admin dashboards, improving brand presence and operational efficiency."
     }
   ];
+
 
   return (
     <Container>

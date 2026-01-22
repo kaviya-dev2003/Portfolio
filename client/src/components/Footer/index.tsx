@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { theme } from "../../styles/theme";
-import { FaGithub, FaLinkedin, FaTwitter, FaArrowUp } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaEnvelope, FaArrowUp } from "react-icons/fa";
 
 const FooterContainer = styled.footer`
   background-color: ${theme.colors.primary};
@@ -134,7 +134,7 @@ const Footer: React.FC = () => {
   // Cast icons to any for React 19 compatibility
   const IconGithub = FaGithub as any;
   const IconLinkedin = FaLinkedin as any;
-  const IconTwitter = FaTwitter as any;
+  const IconTwitter = FaEnvelope as any;
   const IconArrowUp = FaArrowUp as any;
 
   return (
@@ -161,21 +161,21 @@ const Footer: React.FC = () => {
             <SocialIconLink href="https://github.com/kaviya-dev2003" target="_blank" aria-label="GitHub">
               <IconGithub />
             </SocialIconLink>
-            <SocialIconLink href="https://linkedin.com/in/kaviya-venkatesh" target="_blank" aria-label="LinkedIn">
+            <SocialIconLink href="https://www.linkedin.com/in/kaviya2003/" target="_blank" aria-label="LinkedIn">
               <IconLinkedin />
             </SocialIconLink>
-            <SocialIconLink href="https://twitter.com" target="_blank" aria-label="Twitter">
+            <SocialIconLink href="mailto:kaviyavenkatesh2003@gmail.com" target="_blank" aria-label="Email">
               <IconTwitter />
             </SocialIconLink>
           </SocialIcons>
-          <p style={{ color: theme.colors.muted, fontSize: '0.9rem', marginTop: '1rem' }}>
-            kaviyadhars@gmail.com
-          </p>
+          {/* <p style={{ color: theme.colors.muted, fontSize: '0.9rem', marginTop: '1rem' }}>
+            kaviyavenkatesh2003@gmail.com
+          </p> */}
         </SocialColumn>
       </FooterGrid>
 
       <BottomBar>
-        <Copyright>© {new Date().getFullYear()} Kavya Venkatesh. All rights reserved.</Copyright>
+        <Copyright>© {new Date().getFullYear()} Kaviya Venkatesh. All rights reserved.</Copyright>
         <BackToTop onClick={scrollToTop} aria-label="Back to Top">
           <IconArrowUp />
         </BackToTop>

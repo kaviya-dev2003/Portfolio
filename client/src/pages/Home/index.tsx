@@ -8,17 +8,19 @@ import { useNavigate } from "react-router-dom";
 import profileImg from "../../assets/images/profile.png";
 
 const HeroSection = styled.section`
-  height: calc(100vh - 80px);
+  min-height: calc(100vh - 80px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10%;
+  padding: 4rem 10%;
+  gap: 4rem;
   
-  @media (max-width: 768px) {
-    flex-direction: column;
+  @media (max-width: 968px) {
+    flex-direction: column; /* Text first, then image */
     justify-content: center;
     text-align: center;
-    gap: 2rem;
+    gap: 1.5rem; /* Reduced gap between text and image */
+    padding: 2rem 10%; /* Reduced padding */
   }
 `;
 
@@ -89,18 +91,20 @@ const HeroImageWrapper = styled(motion.div)`
   flex: 1;
   display: flex;
   justify-content: flex-end;
+  position: relative;
   
-  @media (max-width: 768px) {
+  @media (max-width: 968px) {
     justify-content: center;
     width: 100%;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
   }
 `;
 
 const AbstractShape = styled.div`
   width: 400px;
   height: 400px;
-  // background: ${theme.colors.primary};
-  background:transprant;
+  background: transparent;
   opacity: 0.05;
   border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   position: relative;
@@ -130,14 +134,13 @@ const ProfileImage = styled(motion.img)`
   border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   box-shadow: ${theme.shadows.soft};
   position: absolute;
-  top: 0%;
-  left: 10%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
   z-index: 2;
   
   @media (max-width: 768px) {
-    width: 220px;
-    height: 220px;
+    width: 250px;
+    height: 250px;
   }
 `;
 
@@ -185,18 +188,18 @@ const Home: React.FC = () => {
         </ButtonGroup>
       </HeroContent>
       <HeroImageWrapper
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, ease: "easeOut" }}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <div style={{ position: 'relative' }}>
           <AbstractShape />
           <ProfileImage
             src={profileImg}
             alt="Kaviya Venkatesh"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
           />
         </div>
       </HeroImageWrapper>

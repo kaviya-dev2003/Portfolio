@@ -6,9 +6,13 @@ import { Button } from "../../components";
 import { slideUp } from "../../animations/motionVariants";
 
 const Container = styled.section`
-  padding: 8rem 10%;
+  padding: 5rem 10%;
   max-width: 800px;
   margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    padding: 4rem 10% 8rem;
+  }
 `;
 
 const Header = styled(motion.div)`
@@ -53,6 +57,11 @@ const Input = styled.input`
   font-size: 1rem;
   background: ${theme.colors.secondary};
   transition: ${theme.transitions.standard};
+
+  &::placeholder {
+    font-size: 0.85rem;   /* 👈 placeholder மட்டும் small */
+    color: #94A3B8;       /* optional: soft color */
+  }
   
   &:focus {
     outline: none;
@@ -100,9 +109,9 @@ const InfoBox = styled.div`
     margin-bottom: 0.5rem;
   }
   p {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: ${theme.colors.primary};
-    font-weight: 500;
+    font-weight: 400;
   }
 `;
 
@@ -177,7 +186,7 @@ const Contact: React.FC = () => {
           <Input
             type="email"
             id="email"
-            placeholder="kaviya@example.com"
+            placeholder="kaviya@gmail.com"
             required
             value={formData.email}
             onChange={handleChange}
@@ -222,11 +231,11 @@ const Contact: React.FC = () => {
       <InfoSection>
         <InfoBox>
           <h4>Email</h4>
-          <p>kaviyadhars@gmail.com</p>
+          <p>kaviyavenkatesh2003@gmail.com</p>
         </InfoBox>
         <InfoBox>
           <h4>LinkedIn</h4>
-          <p>kaviya-venkatesh</p>
+          <p>kaviya Venkatesh</p>
         </InfoBox>
       </InfoSection>
     </Container>

@@ -15,7 +15,7 @@ const Nav = styled.nav`
   position: fixed;
   top: 0;
   width: 100%;
-  z-index: 1000;
+  z-index: 9999;
   transition: ${theme.transitions.standard};
 `;
 
@@ -75,50 +75,55 @@ const NavLink = styled(Link) <{ $active: boolean }>`
 
 const Hamburger = styled.div`
   display: none;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   cursor: pointer;
   color: ${theme.colors.primary};
+  z-index: 10001; /* Above the fixed nav and any mobile menu */
+  padding: 0.5rem;
+  line-height: 0;
 
   @media (max-width: 768px) {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 `;
 
 const Navbar: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
-    // Cast icons to any to resolve React 19 JSX type conflict
-    const IconClose = FaTimes as any;
-    const IconOpen = FaBars as any;
+  // Cast icons to any to resolve React 19 JSX type conflict
+  const IconClose = FaTimes as any;
+  const IconOpen = FaBars as any;
 
-    const links = [
-        { name: "Home", path: "/" },
-        { name: "About", path: "/about" },
-        { name: "Projects", path: "/projects" },
-        { name: "Contact", path: "/contact" },
-    ];
+  const links = [
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
+    { name: "Projects", path: "/projects" },
+    { name: "Contact", path: "/contact" },
+  ];
 
-    return (
-        <Nav>
-            <Logo to="/">Kaviya</Logo>
-            <Hamburger onClick={() => setIsOpen(!isOpen)}>
-                {isOpen ? <IconClose /> : <IconOpen />}
-            </Hamburger>
-            <NavLinks $isOpen={isOpen}>
-                {links.map((link) => (
-                    <NavLink
-                        key={link.name}
-                        to={link.path}
-                        $active={location.pathname === link.path}
-                        onClick={() => setIsOpen(false)}
-                    >
-                        {link.name}
-                    </NavLink>
-                ))}
-            </NavLinks>
-        </Nav>
-    );
+  return (
+    <Nav>
+      <Logo to="/">Kaviya</Logo>
+      <Hamburger onClick={() => setIsOpen(!isOpen)}>
+        {isOpen ? <IconClose /> : <IconOpen />}
+      </Hamburger>
+      <NavLinks $isOpen={isOpen}>
+        {links.map((link) => (
+          <NavLink
+            key={link.name}
+            to={link.path}
+            $active={location.pathname === link.path}
+            onClick={() => setIsOpen(false)}
+          >
+            {link.name}
+          </NavLink>
+        ))}
+      </NavLinks>
+    </Nav>
+  );
 };
 
 export default Navbar;
