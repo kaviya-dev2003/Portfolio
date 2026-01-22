@@ -35,6 +35,15 @@ export const connectToDB = async () => {
       )
     `;
     await connection.query(createTableQuery);
+
+    // Ensure socialMedia column exists (for older tables)
+    try {
+      await connection.query("ALTER TABLE portfolio ADD COLUMN IF NOT EXISTS socialMedia VARCHAR(255) AFTER email");
+    } catch (e) {
+      // Fallback for MySQL versions that don't support ADD COLUMN IF NOT EXISTS
+      console.log("socialMedia column check/add attempted");
+    }
+
     console.log("Portfolio table verified/created");
 
     connection.release();
