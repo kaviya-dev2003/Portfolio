@@ -9,7 +9,11 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "https://portfolio-production-8b1b.up.railway.app",
+  methods: ["GET", "POST"],
+}));
+
 app.use(bodyParser.json());
 
 // ✅ Health check
