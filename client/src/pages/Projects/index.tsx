@@ -65,20 +65,6 @@ const ProjectCard = styled(motion.div)`
   }
 `;
 
-const ImagePlaceholder = styled(motion.div)`
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: ${theme.colors.secondary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.muted};
-  font-family: ${theme.fonts.subheadings};
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-`;
-
 const CardContent = styled.div`
   padding: 2rem;
 `;

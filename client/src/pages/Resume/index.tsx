@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 import { theme } from "../../styles/theme";
 import { Button } from "../../components";
-import { pageTransition, slideUp } from "../../animations/motionVariants";
+import { pageTransition } from "../../animations/motionVariants";
 import { FaDownload, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
@@ -46,50 +46,50 @@ const PDFViewer = styled.iframe`
 `;
 
 const Resume: React.FC = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleDownload = () => {
-        const link = document.createElement("a");
-        link.href = `${process.env.PUBLIC_URL}/resume.pdf`;
-        link.download = "Kaviya_Venkatesh_Resume.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = `${process.env.PUBLIC_URL}/resume.pdf`;
+    link.download = "Kaviya_Venkatesh_Resume.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
-        // Tracking
-        const count = parseInt(localStorage.getItem("resume_downloads") || "0");
-        localStorage.setItem("resume_downloads", (count + 1).toString());
-    };
+    // Tracking
+    const count = parseInt(localStorage.getItem("resume_downloads") || "0");
+    localStorage.setItem("resume_downloads", (count + 1).toString());
+  };
 
-    // Cast icons to any for React 19 compatibility
-    const IconDownload = FaDownload as any;
-    const IconBack = FaArrowLeft as any;
+  // Cast icons to any for React 19 compatibility
+  const IconDownload = FaDownload as any;
+  const IconBack = FaArrowLeft as any;
 
-    return (
-        <Container
-            variants={pageTransition}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-        >
-            <Header>
-                <Button variant="outline" size="small" onClick={() => navigate(-1)}>
-                    <IconBack style={{ marginRight: '8px' }} /> Back
-                </Button>
-                <h2 style={{ fontFamily: theme.fonts.headings }}>Resume Preview</h2>
-                <Button variant="primary" size="small" onClick={handleDownload}>
-                    <IconDownload style={{ marginRight: '8px' }} /> Download
-                </Button>
-            </Header>
+  return (
+    <Container
+      variants={pageTransition}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+    >
+      <Header>
+        <Button variant="outline" size="small" onClick={() => navigate(-1)}>
+          <IconBack style={{ marginRight: '8px' }} /> Back
+        </Button>
+        <h2 style={{ fontFamily: theme.fonts.headings }}>Resume Preview</h2>
+        <Button variant="primary" size="small" onClick={handleDownload}>
+          <IconDownload style={{ marginRight: '8px' }} /> Download
+        </Button>
+      </Header>
 
-            <PreviewWrapper>
-                <PDFViewer
-                    src={`${process.env.PUBLIC_URL}/resume.pdf#toolbar=0&navpanes=0&scrollbar=0`}
-                    title="Resume Preview"
-                />
-            </PreviewWrapper>
-        </Container>
-    );
+      <PreviewWrapper>
+        <PDFViewer
+          src={`${process.env.PUBLIC_URL}/resume.pdf#toolbar=0&navpanes=0&scrollbar=0`}
+          title="Resume Preview"
+        />
+      </PreviewWrapper>
+    </Container>
+  );
 };
 
 export default Resume;

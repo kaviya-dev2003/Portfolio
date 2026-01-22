@@ -2,7 +2,6 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { motion, HTMLMotionProps } from "framer-motion";
 import { theme } from "../../styles/theme";
-import { buttonHover } from "../../animations/motionVariants";
 
 interface ButtonProps {
     variant?: "primary" | "secondary" | "outline";
