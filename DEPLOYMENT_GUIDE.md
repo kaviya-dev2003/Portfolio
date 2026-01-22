@@ -1,47 +1,46 @@
-# Deployment Guide: Portfolio Website
+# Deployment Guide: Railway.com (Full-Stack)
 
-This guide explains how to get your website live on the internet.
+This guide explains how to deploy your entire portfolio (Frontend + Backend + Database) to Railway.com.
 
-## 🚀 Part 1: Deploying the Frontend (GitHub Pages)
+## 🚀 Part 1: Prepare for Deployment
 
-GitHub Pages is used to host your **React Frontend** (the `client` folder).
+I have already optimized your code to work as a "Monorepo":
+- The backend serves the frontend automatically in production.
+- Database settings are configured to use Railway's default variables.
+- Build scripts are unified in the root folder.
 
-### 1. The Automatic Way (GitHub Actions)
-I have configured a "GitHub Action" that will automatically update your website every time you "Push" code to GitHub.
+## ⚙️ Part 2: Railway.com Setup
 
-- **How it works**: Whenever you commit and push changes to the `main` branch, GitHub will run the steps in `.github/workflows/deploy.yml` to build your React app and publish it.
-- **Your URL**: `https://kaviya-dev2003.github.io/Portfolio/`
+### 1. Create a Railway Project
+1. Log in to [Railway.com](https://railway.com/).
+2. Click **"New Project"** -> **"Deploy from GitHub repo"**.
+3. Select your `Portfolio` repository.
 
-### 2. The Manual Way
-If you want to deploy manually from your terminal:
-1. Open terminal in the root folder.
-2. Run: `cd client`
-3. Run: `npm run deploy`
-   - *This command builds the project and pushes the `build` folder to a special branch called `gh-pages`.*
+### 2. Add a Database
+1. Inside your Railway project, click **"Add Service"**.
+2. Select **"Database"** -> **"MySQL"**.
+3. Railway will automatically set up the variables (like `MYSQLHOST`) and link them to your app.
 
----
-
-## ⚙️ Part 2: The Backend Challenge
-
-> [!WARNING]
-> **GitHub Pages CANNOT host your Backend (Express + MySQL).**
-> GitHub Pages is for "Static sites" only.
-
-For your **Contact Form** to work online:
-1. You need to host the `server` folder on a cloud provider like **Render**, **Railway**, or **Railway**.
-2. You need an online database (like **Remote MySQL** or **Aiven**) because your current MySQL is local (XAMPP).
-
-### Temporary Solution:
-If you just want to show your design and resume, GitHub Pages is perfect! The contact form will only work when you are running the backend locally on your computer.
-
----
+### 3. Configure App Settings
+1. Click on your connected GitHub service (the app).
+2. Go to **Variables** tab.
+3. Click **"New Variable"** and add:
+   - `NODE_ENV` = `production`
+4. (Optional) Check that Railway has successfully linked the `MYSQLHOST`, `MYSQLUSER`, etc., variables from the MySQL service.
 
 ## 📝 Summary of Steps to Update Your Site
-1. Make your changes in the code.
+
+Every time you want to update your live site:
+1. Save your changes locally.
 2. Open terminal and run:
    ```bash
    git add .
-   git commit -m "Updated my portfolio"
+   git commit -m "Describe your changes"
    git push origin main
    ```
-3. Wait 2-3 minutes, and your site at `https://kaviya-dev2003.github.io/Portfolio/` will update automatically!
+3. Railway will automatically detect the push, run `npm run build`, and deploy your new version.
+
+---
+
+> [!NOTE]
+> **GitHub Pages vs Railway**: While you *can* still use GitHub Pages for just the design (frontend), Railway is better because it hosts your **Contact Form** and **Database** as well.
