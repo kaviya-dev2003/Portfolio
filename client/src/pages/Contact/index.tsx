@@ -128,8 +128,10 @@ const Contact: React.FC = () => {
     e.preventDefault();
     setStatus("loading");
 
+    const BACKEND_URL = "https://portfolio-production-8b1b.up.railway.app/#/contact";
+
     try {
-      const response = await fetch("/api/form/submit", {
+      const response = await fetch(`${BACKEND_URL}/api/form/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
