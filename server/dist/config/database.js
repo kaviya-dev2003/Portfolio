@@ -16,6 +16,9 @@ exports.pool = promise_1.default.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
+    connectTimeout: 10000, // 10 seconds timeout
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000,
 });
 const connectToDB = async () => {
     try {
@@ -39,7 +42,7 @@ const connectToDB = async () => {
     }
     catch (error) {
         console.error("MySQL connection failed:", error);
-        process.exit(1);
+        // process.exit(1); // 👈 Removed to prevent Railway boot loops
     }
 };
 exports.connectToDB = connectToDB;
