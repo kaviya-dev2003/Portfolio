@@ -37,6 +37,6 @@ export const connectToDB = async () => {
     connection.release();
   } catch (error) {
     console.error("MySQL connection failed:", error);
-    process.exit(1);
+    // process.exit(1); // 👈 Removed to prevent Railway boot loops
   }
 };
