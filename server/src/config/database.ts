@@ -11,7 +11,12 @@ dotenv.config();
 // 1. Define the pool variable first
 let poolInstance: mysql.Pool;
 
-if (process.env.MYSQL_URL) {
+// Safe Diagnostics (logs only presence/length, not values)
+console.log("[Diagnostics] Checking Variables:");
+console.log(`- MYSQL_URL: ${process.env.MYSQL_URL ? 'PRESENT (Len: ' + process.env.MYSQL_URL.length + ')' : 'MISSING'}`);
+console.log(`- MYSQLHOST: ${process.env.MYSQLHOST || 'MISSING'} (Status: ${process.env.MYSQLHOST === 'MYSQLHOST' ? 'WARNING: LITERAL STRING' : 'OK'})`);
+
+if (process.env.MYSQL_URL && process.env.MYSQL_URL !== "MYSQL_URL") {
   // Use URI string overload
   poolInstance = mysql.createPool(process.env.MYSQL_URL);
 } else {
@@ -25,7 +30,7 @@ if (process.env.MYSQL_URL) {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    connectTimeout: 10000,
+    connectTimeout: 20000, 
     enableKeepAlive: true,
     keepAliveInitialDelay: 10000,
   });
