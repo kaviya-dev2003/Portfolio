@@ -30,7 +30,7 @@ const dbKeys = allKeys.filter(k => /MYSQL|DATABASE|DB_|HOST|PORT/i.test(k));
 console.log(`- Database-related Keys Found: ${dbKeys.join(", ") || "NONE!"}`);
 
 const mysqlUrl = getEnv("MYSQL_URL");
-const mysqlHost = getEnv("MYSQLHOST") || getEnv("DB_HOST", "localhost");
+const mysqlHost = getEnv("MYSQLHOST") || getEnv("DB_HOST", "MISSING_DB_HOST_IN_RAILWAY");
 const mysqlUser = getEnv("MYSQLUSER", getEnv("DB_USER", "root"));
 const mysqlDb = getEnv("MYSQLDATABASE", getEnv("DB_NAME", "portfolio"));
 

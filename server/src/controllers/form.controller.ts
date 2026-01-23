@@ -25,11 +25,18 @@ export const handleFormSubmission = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error(`[Form] Request ${requestId} failed:`, error);
     
-    if (error.message === "Database operation timed out") {
+    let userMessage = "Error submitting form";
+    if (error.code === "ECONNREFUSED") {
+      userMessage = `Database connection refused. Check your Railway variables.`;
+    } else if (error.message === "Database operation timed out") {
       res.status(504).json({ message: "Database is taking too long to respond. Please try again later." });
       return;
     }
     
-    res.status(500).json({ message: "Error submitting form", error: error.message || "Internal Server Error" });
+    res.status(500).json({ 
+      message: userMessage, 
+      error: error.message || "Internal Server Error",
+      code: error.code
+    });
   }
 };
