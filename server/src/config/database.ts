@@ -8,25 +8,36 @@ dotenv.config();
  * This version uses explicit separate calls to createPool to satisfy TypeScript overloads.
  */
 
+// Helper to safely get env variables (ignores literal placeholders like "MYSQLHOST")
+const getEnv = (key: string, fallback: string = ""): string => {
+  const value = process.env[key];
+  if (!value || value === key || value === "UNDEFINED") return fallback;
+  return value;
+};
+
 // 1. Define the pool variable first
 let poolInstance: mysql.Pool;
 
-// Safe Diagnostics (logs only presence/length, not values)
-console.log("[Diagnostics] Checking Variables:");
-console.log(`- MYSQL_URL: ${process.env.MYSQL_URL ? 'PRESENT (Len: ' + process.env.MYSQL_URL.length + ')' : 'MISSING'}`);
-console.log(`- MYSQLHOST: ${process.env.MYSQLHOST || 'MISSING'} (Status: ${process.env.MYSQLHOST === 'MYSQLHOST' ? 'WARNING: LITERAL STRING' : 'OK'})`);
+// Safe Diagnostics (logs only presence/keys, NOT values)
+console.log("[Diagnostics] Environment Variables Available:");
+console.log(Object.keys(process.env).filter(k => !k.includes("PASS") && !k.includes("KEY") && !k.includes("SECRET")).join(", "));
 
-if (process.env.MYSQL_URL && process.env.MYSQL_URL !== "MYSQL_URL") {
-  // Use URI string overload
-  poolInstance = mysql.createPool(process.env.MYSQL_URL);
+const mysqlUrl = getEnv("MYSQL_URL");
+const mysqlHost = getEnv("MYSQLHOST") || getEnv("DB_HOST", "localhost");
+
+console.log(`[Diagnostics] Connection Details:`);
+console.log(`- MYSQL_URL: ${mysqlUrl ? 'VALID (Len: ' + mysqlUrl.length + ')' : 'MISSING/INVALID'}`);
+console.log(`- Final Host: ${mysqlHost}`);
+
+if (mysqlUrl) {
+  poolInstance = mysql.createPool(mysqlUrl);
 } else {
-  // Use PoolOptions object overload
   poolInstance = mysql.createPool({
-    host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
-    user: process.env.MYSQLUSER || process.env.DB_USER || "root",
-    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
-    database: process.env.MYSQLDATABASE || process.env.DB_NAME || "portfolio",
-    port: parseInt(process.env.MYSQLPORT || "3306"),
+    host: mysqlHost,
+    user: getEnv("MYSQLUSER", getEnv("DB_USER", "root")),
+    password: getEnv("MYSQLPASSWORD", getEnv("DB_PASSWORD", "")),
+    database: getEnv("MYSQLDATABASE", getEnv("DB_NAME", "portfolio")),
+    port: parseInt(getEnv("MYSQLPORT", "3306")),
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
