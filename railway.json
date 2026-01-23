@@ -1,0 +1,12 @@
+{
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": "cd server && npm install",
+    "runCommand": "cd server && npm start"
+  },
+  "deploy": {
+    "startCommand": "node server/server-prod.js",
+    "healthcheckPath": "/api/health",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}

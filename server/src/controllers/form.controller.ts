@@ -1,42 +1,40 @@
 import { Request, Response } from "express";
 import { createFormEntry } from "../services/form.service";
-import { CreateFormDto } from "../dtos/form.dto";
 
-export const handleFormSubmission = async (req: Request, res: Response) => {
+export const handleFormSubmission = async (req: Request, res: Response): Promise<void> => {
   const requestId = Math.random().toString(36).substring(7);
   console.log(`[Form] Request ${requestId} received:`, req.body.email);
-
+  
   try {
-    const formData: CreateFormDto = req.body;
+    const formData = req.body;
     
-    // Add a 10-second timeout for the database operation
     const dbPromise = createFormEntry(formData);
     const timeoutPromise = new Promise((_, reject) => 
       setTimeout(() => reject(new Error("Database operation timed out")), 10000)
     );
-
+    
     console.log(`[Form] Request ${requestId} attempting DB insert...`);
     const savedData = await Promise.race([dbPromise, timeoutPromise]);
     
     console.log(`[Form] Request ${requestId} success!`);
-    res
-      .status(201)
-      .json({ message: "Form submitted successfully", data: savedData });
-  } catch (error: any) {
-    console.error(`[Form] Request ${requestId} failed:`, error);
+    res.status(201).json({ 
+      message: "Form submitted successfully", 
+      data: savedData 
+    });
     
-    let userMessage = "Error submitting form";
-    if (error.code === "ECONNREFUSED") {
-      userMessage = `Database connection refused. Check your Railway variables.`;
-    } else if (error.message === "Database operation timed out") {
-      res.status(504).json({ message: "Database is taking too long to respond. Please try again later." });
+  } catch (error: any) {
+    console.error(`[Form] Request ${requestId} failed:`, error.message || error);
+    
+    if (error.message === "Database operation timed out") {
+      res.status(504).json({ 
+        message: "Database is taking too long to respond. Please try again later." 
+      });
       return;
     }
     
     res.status(500).json({ 
-      message: userMessage, 
-      error: error.message || "Internal Server Error",
-      code: error.code
+      message: "Error submitting form", 
+      error: error.message || error 
     });
   }
 };

@@ -8,3 +8,4 @@ const form_controller_1 = require("../controllers/form.controller");
 const router = express_1.default.Router();
 router.post("/submit", form_controller_1.handleFormSubmission);
 exports.default = router;
+//# sourceMappingURL=form.route.js.map

@@ -6,3 +6,4 @@ const createFormEntry = async (data) => {
     return await form_model_1.FormModel.create(data);
 };
 exports.createFormEntry = createFormEntry;
+//# sourceMappingURL=form.service.js.map

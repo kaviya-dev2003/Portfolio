@@ -7,63 +7,109 @@ exports.connectToDB = exports.pool = void 0;
 const promise_1 = __importDefault(require("mysql2/promise"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-/**
- * DB CONFIGURATION - ANTIGRAVITY FIX V3
- * This version uses explicit separate calls to createPool to satisfy TypeScript overloads.
- */
-// 1. Define the pool variable first
-let poolInstance;
+console.log("🔧 Database Configuration Initializing...");
+console.log("==========================================");
+const envVars = {
+    NODE_ENV: process.env.NODE_ENV,
+    MYSQL_URL: process.env.MYSQL_URL ? "***SET***" : "NOT SET",
+    MYSQLHOST: process.env.MYSQLHOST,
+    MYSQLUSER: process.env.MYSQLUSER,
+    MYSQLDATABASE: process.env.MYSQLDATABASE,
+    MYSQLPORT: process.env.MYSQLPORT,
+};
+console.log("Environment Variables Check:");
+Object.entries(envVars).forEach(([key, value]) => {
+    console.log(`  ${key}: ${value}`);
+});
+// Determine connection configuration
+let connectionConfig;
 if (process.env.MYSQL_URL) {
-    // Use URI string overload
-    poolInstance = promise_1.default.createPool(process.env.MYSQL_URL);
+    console.log("📡 Using MYSQL_URL for connection");
+    // Parse the URL to extract components
+    const url = process.env.MYSQL_URL;
+    console.log(`  URL: ${url.replace(/:[^:]*@/, ':*****@')}`); // Hide password
+    // For mysql2, we can use the URL directly with ssl options
+    connectionConfig = {
+        uri: url,
+        ssl: {
+            rejectUnauthorized: false
+        },
+        connectTimeout: 30000,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+    };
 }
-else {
-    // Use PoolOptions object overload
-    poolInstance = promise_1.default.createPool({
-        host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
-        user: process.env.MYSQLUSER || process.env.DB_USER || "root",
-        password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
-        database: process.env.MYSQLDATABASE || process.env.DB_NAME || "portfolio",
+else if (process.env.MYSQLHOST) {
+    console.log("📡 Using individual MySQL variables");
+    console.log(`  Host: ${process.env.MYSQLHOST}`);
+    connectionConfig = {
+        host: process.env.MYSQLHOST,
+        user: process.env.MYSQLUSER || "root",
+        password: process.env.MYSQLPASSWORD || "",
+        database: process.env.MYSQLDATABASE || "railway",
         port: parseInt(process.env.MYSQLPORT || "3306"),
         waitForConnections: true,
         connectionLimit: 10,
         queueLimit: 0,
-        connectTimeout: 10000,
-        enableKeepAlive: true,
-        keepAliveInitialDelay: 10000,
-    });
+        connectTimeout: 30000,
+        ssl: {
+            rejectUnauthorized: false
+        }
+    };
 }
-exports.pool = poolInstance;
-console.log(`[DB] Initializing pool with: ${process.env.MYSQL_URL ? 'MYSQL_URL' : 'Config Object'}`);
-const connectToDB = async () => {
+else {
+    console.warn("⚠️ No MySQL configuration found, using defaults");
+    connectionConfig = {
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "portfolio",
+        port: 3306
+    };
+}
+// Create connection pool
+exports.pool = promise_1.default.createPool(connectionConfig);
+// Test connection on startup
+const connectToDB = async (retryCount = 0) => {
+    const maxRetries = 3;
     try {
+        console.log(`🔌 Attempting MySQL connection (Attempt ${retryCount + 1}/${maxRetries + 1})...`);
         const connection = await exports.pool.getConnection();
-        console.log("MySQL Connected Successfully");
-        // Automatically create table if it doesn't exist
-        const createTableQuery = `
+        const [dbInfo] = await connection.query("SELECT DATABASE() as current_db, VERSION() as version");
+        const info = dbInfo[0];
+        console.log("✅ MySQL Connected Successfully!");
+        console.log(`   Database: ${info.current_db}`);
+        console.log(`   Version: ${info.version}`);
+        // Create portfolio table if it doesn't exist
+        const createTableSQL = `
       CREATE TABLE IF NOT EXISTS portfolio (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL,
         socialMedia VARCHAR(255),
         message TEXT NOT NULL,
-        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `;
-        await connection.query(createTableQuery);
-        // Ensure socialMedia column exists (for older tables)
-        try {
-            await connection.query("ALTER TABLE portfolio ADD COLUMN IF NOT EXISTS socialMedia VARCHAR(255) AFTER email");
-        }
-        catch (e) {
-            console.log("socialMedia column check/add attempted");
-        }
-        console.log("Portfolio table verified/created");
+        await connection.query(createTableSQL);
+        console.log("✅ Portfolio table verified");
         connection.release();
     }
     catch (error) {
-        console.error("MySQL connection failed:", error);
+        console.error(`❌ MySQL Connection Failed (Attempt ${retryCount + 1}):`);
+        console.error(`   Error: ${error.message}`);
+        if (retryCount < maxRetries) {
+            const delay = 2000 * (retryCount + 1);
+            console.log(`   Retrying in ${delay / 1000} seconds...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return (0, exports.connectToDB)(retryCount + 1);
+        }
+        else {
+            console.error("💥 Maximum retries reached. Could not connect to MySQL.");
+            throw error;
+        }
     }
 };
 exports.connectToDB = connectToDB;
+//# sourceMappingURL=database.js.map

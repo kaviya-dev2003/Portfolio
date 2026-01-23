@@ -124,12 +124,21 @@ const Contact: React.FC = () => {
   });
   const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle");
 
+  // Log status changes
+  React.useEffect(() => {
+    console.log("🔄 Status changed to:", status);
+  }, [status]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🟡 Submit started, setting status to loading");
     setStatus("loading");
 
     try {
-      const response = await fetch("/api/form/submit", {
+      console.log("📤 Sending to:", "http://localhost:5001/api/form/submit");
+      console.log("📤 Data:", formData);
+
+      const response = await fetch("http://localhost:5001/api/form/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -137,15 +146,41 @@ const Contact: React.FC = () => {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
+      console.log("📥 Response status:", response.status);
+      console.log("📥 Response ok:", response.ok);
+
+      // Check if response is OK before parsing
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("📥 Response data:", result);
+
+      if (result.success) {
+        console.log("🟢 Success! Setting status to success");
         setStatus("success");
         setFormData({ name: "", email: "", socialMedia: "", message: "" });
+
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          console.log("⏰ Clearing success message");
+          setStatus("idle");
+        }, 3000);
       } else {
+        console.log("🔴 Server returned error:", result.message);
         setStatus("error");
       }
-    } catch (error) {
-      console.error("Submission error:", error);
+
+    } catch (error: any) {
+      console.error("❌ Submission error:", error);
+      console.error("Error message:", error.message);
       setStatus("error");
+
+      // Clear error message after 3 seconds
+      setTimeout(() => {
+        setStatus("idle");
+      }, 3000);
     }
   };
 
@@ -224,8 +259,40 @@ const Contact: React.FC = () => {
           {status === "loading" ? "Sending..." : "Send Message"}
         </Button>
 
-        {status === "success" && <p style={{ color: 'green', textAlign: 'center' }}>Message sent successfully!</p>}
-        {status === "error" && <p style={{ color: 'red', textAlign: 'center' }}>Failed to send message. Please try again.</p>}
+        {status === "success" && (
+          <div style={{
+            color: 'green',
+            textAlign: 'center',
+            marginTop: '15px',
+            padding: '10px',
+            backgroundColor: '#f0fff0',
+            border: '1px solid #4CAF50',
+            borderRadius: '5px',
+            fontWeight: 'bold',
+            fontSize: '16px'
+          }}>
+            ✅ Message sent successfully!
+            <div style={{ fontSize: '14px', fontWeight: 'normal', marginTop: '5px' }}>
+              Your message has been saved to the database.
+            </div>
+          </div>
+        )}
+
+        {status === "error" && (
+          <div style={{
+            color: 'red',
+            textAlign: 'center',
+            marginTop: '15px',
+            padding: '10px',
+            backgroundColor: '#fff0f0',
+            border: '1px solid #f44336',
+            borderRadius: '5px',
+            fontWeight: 'bold',
+            fontSize: '16px'
+          }}>
+            ❌ Failed to send message. Please try again.
+          </div>
+        )}
       </ContactForm>
 
       <InfoSection>
