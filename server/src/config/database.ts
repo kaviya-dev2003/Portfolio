@@ -11,7 +11,7 @@ dotenv.config();
 // Helper to safely get env variables (ignores literal placeholders like "MYSQLHOST")
 const getEnv = (key: string, fallback: string = ""): string => {
   const value = process.env[key];
-  if (!value || value === key || value === "UNDEFINED") return fallback;
+  if (!value || value === key || value === "UNDEFINED" || value.startsWith("${{")) return fallback;
   return value;
 };
 
@@ -19,15 +19,20 @@ const getEnv = (key: string, fallback: string = ""): string => {
 let poolInstance: mysql.Pool;
 
 // Safe Diagnostics (logs only presence/keys, NOT values)
-console.log("[Diagnostics] Environment Variables Available:");
-console.log(Object.keys(process.env).filter(k => !k.includes("PASS") && !k.includes("KEY") && !k.includes("SECRET")).join(", "));
+const envKeys = Object.keys(process.env).filter(k => 
+  k.includes("MYSQL") || k.includes("DB_") || k.includes("DATABASE") || k.includes("HOST") || k.includes("PORT")
+).join(", ");
+console.log("[Diagnostics] Related Env Keys Found:", envKeys || "NONE");
 
 const mysqlUrl = getEnv("MYSQL_URL");
 const mysqlHost = getEnv("MYSQLHOST") || getEnv("DB_HOST", "localhost");
 
-console.log(`[Diagnostics] Connection Details:`);
-console.log(`- MYSQL_URL: ${mysqlUrl ? 'VALID (Len: ' + mysqlUrl.length + ')' : 'MISSING/INVALID'}`);
-console.log(`- Final Host: ${mysqlHost}`);
+if (process.env.NODE_ENV === "production" && mysqlHost === "localhost") {
+  console.error("[CRITICAL] Database host is 'localhost' in production! Environment variables are likely MISSING.");
+}
+
+console.log(`[Diagnostics] Final Host: ${mysqlHost}`);
+console.log(`- MYSQL_URL Status: ${mysqlUrl ? 'PRESENT (Len: ' + mysqlUrl.length + ')' : 'MISSING'}`);
 
 if (mysqlUrl) {
   poolInstance = mysql.createPool(mysqlUrl);
