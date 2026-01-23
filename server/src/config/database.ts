@@ -18,30 +18,47 @@ const getEnv = (key: string, fallback: string = ""): string => {
 // 1. Define the pool variable first
 let poolInstance: mysql.Pool;
 
-// Safe Diagnostics (logs only presence/keys, NOT values)
-const envKeys = Object.keys(process.env).filter(k => 
-  k.includes("MYSQL") || k.includes("DB_") || k.includes("DATABASE") || k.includes("HOST") || k.includes("PORT")
-).join(", ");
-console.log("[Diagnostics] Related Env Keys Found:", envKeys || "NONE");
+// EXTREME DIAGNOSTICS - LOGGED AT STARTUP
+console.log("\n" + "=".repeat(50));
+console.log("🚀 DATABASE INITIALIZATION STARTUP");
+console.log("=".repeat(50));
+console.log(`- NODE_ENV: ${process.env.NODE_ENV}`);
+
+// Safe Environment Dump (Keys only)
+const allKeys = Object.keys(process.env).sort();
+const dbKeys = allKeys.filter(k => /MYSQL|DATABASE|DB_|HOST|PORT/i.test(k));
+console.log(`- Database-related Keys Found: ${dbKeys.join(", ") || "NONE!"}`);
 
 const mysqlUrl = getEnv("MYSQL_URL");
 const mysqlHost = getEnv("MYSQLHOST") || getEnv("DB_HOST", "localhost");
+const mysqlUser = getEnv("MYSQLUSER", getEnv("DB_USER", "root"));
+const mysqlDb = getEnv("MYSQLDATABASE", getEnv("DB_NAME", "portfolio"));
 
-if (process.env.NODE_ENV === "production" && mysqlHost === "localhost") {
-  console.error("[CRITICAL] Database host is 'localhost' in production! Environment variables are likely MISSING.");
+console.log(`- Final Host: ${mysqlHost}`);
+console.log(`- Final User: ${mysqlUser}`);
+console.log(`- Final DB:   ${mysqlDb}`);
+console.log(`- MYSQL_URL Presence: ${mysqlUrl ? 'PRESENT (Len: ' + mysqlUrl.length + ')' : 'MISSING'}`);
+
+if (process.env.NODE_ENV === "production") {
+  if (mysqlHost === "localhost" || mysqlHost === "127.0.0.1") {
+    console.error("\n" + "!".repeat(50));
+    console.error("⛔ CRITICAL ERROR: DATABASE HOST IS 'LOCALHOST' IN PRODUCTION!");
+    console.error("This means your Railway Environment Variables are NOT LINKED correctly.");
+    console.error("Check your Service Variables in the Railway Dashboard.");
+    console.error("!".repeat(50) + "\n");
+  }
 }
 
-console.log(`[Diagnostics] Final Host: ${mysqlHost}`);
-console.log(`- MYSQL_URL Status: ${mysqlUrl ? 'PRESENT (Len: ' + mysqlUrl.length + ')' : 'MISSING'}`);
+console.log("=".repeat(50) + "\n");
 
 if (mysqlUrl) {
   poolInstance = mysql.createPool(mysqlUrl);
 } else {
   poolInstance = mysql.createPool({
     host: mysqlHost,
-    user: getEnv("MYSQLUSER", getEnv("DB_USER", "root")),
+    user: mysqlUser,
     password: getEnv("MYSQLPASSWORD", getEnv("DB_PASSWORD", "")),
-    database: getEnv("MYSQLDATABASE", getEnv("DB_NAME", "portfolio")),
+    database: mysqlDb,
     port: parseInt(getEnv("MYSQLPORT", "3306")),
     waitForConnections: true,
     connectionLimit: 10,
@@ -53,8 +70,6 @@ if (mysqlUrl) {
 }
 
 export const pool = poolInstance;
-
-console.log(`[DB] Initializing pool with: ${process.env.MYSQL_URL ? 'MYSQL_URL' : 'Config Object'}`);
 
 export const connectToDB = async () => {
   try {
