@@ -194,7 +194,7 @@ const Contact: React.FC = () => {
   return (
     <Container>
       <Header variants={slideUp} initial="initial" animate="animate">
-        <Title>Get In Touch</Title>
+        <Title>Get In Touch </Title>
         <p>Interested in collaborating or have a question? Leave a message below.</p>
       </Header>
 
