@@ -7,7 +7,7 @@ COPY server/package*.json ./server/
 COPY server/server-prod.js ./server/
 
 # Copy React build
-COPY client/build ./client/build
+# COPY client/build ./client/build
 
 # Install server dependencies
 RUN cd server && npm ci --only=production
