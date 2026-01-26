@@ -194,7 +194,7 @@ const Contact: React.FC = () => {
   return (
     <Container>
       <Header variants={slideUp} initial="initial" animate="animate">
-        <Title>Get In Touch <span style={{ fontSize: '10px', opacity: 0.3 }}>v2.0-FINAL</span></Title>
+        <Title>Get In Touch</Title>
         <p>Interested in collaborating or have a question? Leave a message below.</p>
       </Header>
 
