@@ -2,6 +2,7 @@
 const mysql = require("mysql2/promise");
 const cors = require("cors");
 const path = require("path");
+require("dotenv").config();
 
 const app = express();
 
@@ -14,13 +15,40 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 8080;
 
-// Railway provides MYSQL_URL
+// Parse Railway's MYSQL_URL
+// Format: mysql://user:password@host:port/database
+function parseMySQLUrl(url) {
+  if (!url) {
+    throw new Error("MYSQL_URL environment variable is not set");
+  }
+  
+  const match = url.match(/mysql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
+  if (!match) {
+    throw new Error("Invalid MYSQL_URL format");
+  }
+  
+  return {
+    host: match[3],
+    user: match[1],
+    password: match[2],
+    port: parseInt(match[4]),
+    database: match[5]
+  };
+}
+
+const dbConfig = parseMySQLUrl(process.env.MYSQL_URL);
+
 const pool = mysql.createPool({
-  uri: process.env.MYSQL_URL,
-  ssl: { rejectUnauthorized: false },
+  host: dbConfig.host,
+  user: dbConfig.user,
+  password: dbConfig.password,
+  database: dbConfig.database,
+  port: dbConfig.port,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0
 });
 
 // Health check
@@ -82,7 +110,10 @@ if (process.env.NODE_ENV === "production") {
 // Initialize database
 async function initDB() {
   try {
+    console.log("🔌 Testing database connection...");
     const conn = await pool.getConnection();
+    console.log("✅ Database connection successful!");
+    
     await conn.query(`
       CREATE TABLE IF NOT EXISTS portfolio (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -95,8 +126,11 @@ async function initDB() {
     `);
     console.log("✅ Database table ready");
     conn.release();
+    return true;
   } catch (error) {
-    console.error("Database init error:", error.message);
+    console.error("❌ Database init error:", error.message);
+    console.error("Full error:", error);
+    return false;
   }
 }
 
@@ -104,7 +138,13 @@ async function initDB() {
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`📊 Health: https://your-app-name.up.railway.app/api/health`);
+  console.log(`📊 Database host: ${dbConfig.host}`);
+  console.log(`📊 Database name: ${dbConfig.database}`);
   
-  await initDB();
+  const dbReady = await initDB();
+  if (dbReady) {
+    console.log("✅ Application ready to accept requests");
+  } else {
+    console.log("⚠️ Application started but database connection failed");
+  }
 });
