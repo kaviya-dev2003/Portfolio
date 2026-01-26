@@ -1,19 +1,12 @@
 FROM node:18-alpine
-
 WORKDIR /app
 
-# Copy server files
-COPY server/package*.json ./server/
-COPY server/server-prod.js ./server/
+# Copy ALL server files, not just one
+COPY server/ ./server/
 
-# Copy React build
-# COPY client/build ./client/build
+# Install dependencies
+WORKDIR /app/server
+RUN npm ci --only=production
 
-# Install server dependencies
-RUN cd server && npm ci --only=production
-
-# Expose port
-EXPOSE 8080
-
-# Start server
-CMD ["node", "server/server-prod.js"]
+EXPOSE 3000
+CMD ["node", "dist/index.js"]  # or "server-prod.js" if that's your entry
