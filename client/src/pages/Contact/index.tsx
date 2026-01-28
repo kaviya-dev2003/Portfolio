@@ -272,9 +272,7 @@ const Contact: React.FC = () => {
             fontSize: '16px'
           }}>
             ✅ Message sent successfully!
-            <div style={{ fontSize: '14px', fontWeight: 'normal', marginTop: '5px' }}>
-              Your message has been saved to the database.
-            </div>
+          
           </div>
         )}
 
