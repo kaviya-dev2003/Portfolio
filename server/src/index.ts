@@ -84,11 +84,26 @@ app.post("/api/form/submit", async (req, res) => {
 });
 
 // Serve React App in Production
-if (process.env.NODE_ENV === "production") {
-    const buildPath = path.join(__dirname, "../../client/build");
+const isDev = process.env.NODE_ENV === "development";
+const buildPath = path.join(__dirname, "../../client/build");
+
+console.log(`🛠️ Mode: ${process.env.NODE_ENV || "not set"}`);
+console.log(`📂 Checking build path: ${buildPath}`);
+
+if (!isDev) {
     app.use(express.static(buildPath));
     app.get("*", (req, res) => {
-        res.sendFile(path.join(buildPath, "index.html"));
+        const indexPath = path.join(buildPath, "index.html");
+        res.sendFile(indexPath, (err) => {
+            if (err) {
+                console.error(`❌ Error sending index.html from ${indexPath}:`, err);
+                res.status(500).send("Error loading the application. Please check if the client build folder exists.");
+            }
+        });
+    });
+} else {
+    app.get("/", (req, res) => {
+        res.send("Backend is running. Use the client dev server for the frontend.");
     });
 }
 
