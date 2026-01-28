@@ -56,12 +56,12 @@ const initDB = async () => {
 };
 
 // Health Check
-app.get("/api/health", (req: Request, res: Response) => {
+app.get("/api/health", (req, res) => {
     res.status(200).json({ status: "ok", db: pool ? "connected" : "mock" });
 });
 
 // Form Submission
-app.post("/api/form/submit", async (req: Request, res: Response) => {
+app.post("/api/form/submit", async (req, res) => {
     const { name, email, socialMedia, message } = req.body;
     
     console.log(`📩 Form submission received: ${email}`);
@@ -72,10 +72,10 @@ app.post("/api/form/submit", async (req: Request, res: Response) => {
                 "INSERT INTO portfolio (name, email, socialMedia, message) VALUES (?, ?, ?, ?)",
                 [name, email, socialMedia || null, message]
             );
-            return res.status(201).json({ success: true, message: "Form submitted and saved to database" });
+            res.status(201).json({ success: true, message: "Form submitted and saved to database" });
         } else {
             console.log("📝 Mock save (no DB):", { name, email, message });
-            return res.status(201).json({ success: true, message: "Form submitted successfully (mock mode)" });
+            res.status(201).json({ success: true, message: "Form submitted successfully (mock mode)" });
         }
     } catch (error: any) {
         console.error("❌ Form submission error:", error.message);
@@ -87,7 +87,7 @@ app.post("/api/form/submit", async (req: Request, res: Response) => {
 if (process.env.NODE_ENV === "production") {
     const buildPath = path.join(__dirname, "../../client/build");
     app.use(express.static(buildPath));
-    app.get("*", (req: Request, res: Response) => {
+    app.get("*", (req, res) => {
         res.sendFile(path.join(buildPath, "index.html"));
     });
 }
