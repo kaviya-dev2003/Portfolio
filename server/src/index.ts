@@ -1,29 +1,25 @@
-import express, { Request, Response } from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import mysql, { Pool } from "mysql2/promise";
-import path from "path";
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const mysql = require("mysql2/promise");
+const path = require("path");
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Database Pool Setup (with fallback)
-let pool: Pool | null = null;
+let pool = null;
 
-const initDB = async (): Promise<void> => {
+const initDB = async () => {
     try {
         if (process.env.MYSQL_URL || process.env.MYSQLHOST) {
-            let config: any;
-            
+            let config;
             if (process.env.MYSQL_URL) {
-                // Parse MYSQL_URL
-                const url = new URL(process.env.MYSQL_URL as string);
+                const url = new URL(process.env.MYSQL_URL);
                 config = {
                     host: url.hostname,
                     user: url.username,
@@ -34,17 +30,15 @@ const initDB = async (): Promise<void> => {
                 };
             } else {
                 config = {
-                    host: process.env.MYSQLHOST as string,
-                    user: process.env.MYSQLUSER as string,
-                    password: process.env.MYSQLPASSWORD as string,
-                    database: process.env.MYSQLDATABASE as string,
+                    host: process.env.MYSQLHOST,
+                    user: process.env.MYSQLUSER,
+                    password: process.env.MYSQLPASSWORD,
+                    database: process.env.MYSQLDATABASE,
                     port: parseInt(process.env.MYSQLPORT || "3306"),
                     ssl: { rejectUnauthorized: false }
                 };
             }
-            
             pool = mysql.createPool(config);
-            
             const connection = await pool.getConnection();
             await connection.query(`
                 CREATE TABLE IF NOT EXISTS portfolio (
@@ -57,65 +51,46 @@ const initDB = async (): Promise<void> => {
                 )
             `);
             connection.release();
-            console.log("✅ Database initialized successfully");
+            console.log("✅ Database initialized");
         } else {
-            console.warn("⚠️ No database configuration found. Running in mock mode.");
+            console.warn("⚠️ Running in mock mode");
         }
-    } catch (error: any) {
-        console.error("❌ Database initialization failed:", error.message);
+    } catch (error) {
+        console.error("❌ Database init failed:", error.message);
         pool = null;
     }
 };
 
-// Health Check
-app.get("/api/health", (req: Request, res: Response) => {
-    res.status(200).json({ status: "ok", db: pool ? "connected" : "mock" });
+app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", db: pool ? "connected" : "mock" });
 });
 
-// Form Submission
-app.post("/api/form/submit", async (req: Request, res: Response) => {
+app.post("/api/form/submit", async (req, res) => {
     const { name, email, socialMedia, message } = req.body;
-    
-    console.log(`📩 Form submission received: ${email}`);
-
+    console.log(`📩 Form: ${email}`);
     try {
         if (pool) {
             await pool.query(
                 "INSERT INTO portfolio (name, email, socialMedia, message) VALUES (?, ?, ?, ?)",
                 [name, email, socialMedia || null, message]
             );
-            res.status(201).json({ success: true, message: "Form submitted and saved to database" });
+            res.json({ success: true, message: "Saved to database" });
         } else {
-            console.log("📝 Mock save (no DB):", { name, email, message });
-            res.status(201).json({ success: true, message: "Form submitted successfully (mock mode)" });
+            console.log("📝 Mock save");
+            res.json({ success: true, message: "Submitted (mock)" });
         }
-    } catch (error: any) {
-        console.error("❌ Form submission error:", error.message);
-        res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+    } catch (error) {
+        console.error("❌ Error:", error.message);
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
 });
 
-// Serve React App in Production
 const buildPath = path.join(__dirname, "../../client/build");
-
-console.log(`🛠️ Mode: ${process.env.NODE_ENV || "not set"}`);
-console.log(`📂 Checking build path: ${buildPath}`);
-
-// Serve static files from React build
 app.use(express.static(buildPath));
+app.get("/api/test", (req, res) => res.json({ message: "API working" }));
+app.get("*", (req, res) => res.sendFile(path.join(buildPath, "index.html")));
 
-// API routes
-app.get("/api/test", (req: Request, res: Response) => {
-    res.json({ message: "API is working" });
-});
-
-// All other routes go to React app
-app.get("*", (req: Request, res: Response) => {
-    res.sendFile(path.join(buildPath, "index.html"));
-});
-
-// Start Server
 app.listen(PORT, async () => {
     await initDB();
-    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🚀 Server on port ${PORT}`);
 });
