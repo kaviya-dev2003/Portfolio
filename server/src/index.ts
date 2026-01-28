@@ -1,7 +1,7 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import mysql, { Pool, PoolConnection, PoolOptions } from "mysql2/promise";
+import mysql, { Pool } from "mysql2/promise";
 import path from "path";
 
 dotenv.config();
@@ -19,26 +19,25 @@ let pool: Pool | null = null;
 const initDB = async (): Promise<void> => {
     try {
         if (process.env.MYSQL_URL || process.env.MYSQLHOST) {
-            let config: PoolOptions;
+            let config: any;
             
             if (process.env.MYSQL_URL) {
-                // For MYSQL_URL (Render MySQL), we need to parse the URL
-                const url = new URL(process.env.MYSQL_URL);
+                // Parse MYSQL_URL
+                const url = new URL(process.env.MYSQL_URL as string);
                 config = {
                     host: url.hostname,
                     user: url.username,
                     password: url.password,
-                    database: url.pathname.slice(1), // Remove leading '/'
+                    database: url.pathname.slice(1),
                     port: parseInt(url.port) || 3306,
                     ssl: { rejectUnauthorized: false }
                 };
             } else {
-                // For individual environment variables
                 config = {
-                    host: process.env.MYSQLHOST!,
-                    user: process.env.MYSQLUSER!,
-                    password: process.env.MYSQLPASSWORD!,
-                    database: process.env.MYSQLDATABASE!,
+                    host: process.env.MYSQLHOST as string,
+                    user: process.env.MYSQLUSER as string,
+                    password: process.env.MYSQLPASSWORD as string,
+                    database: process.env.MYSQLDATABASE as string,
                     port: parseInt(process.env.MYSQLPORT || "3306"),
                     ssl: { rejectUnauthorized: false }
                 };
@@ -46,8 +45,7 @@ const initDB = async (): Promise<void> => {
             
             pool = mysql.createPool(config);
             
-            // Test connection and create table
-            const connection: PoolConnection = await pool.getConnection();
+            const connection = await pool.getConnection();
             await connection.query(`
                 CREATE TABLE IF NOT EXISTS portfolio (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,10 +61,9 @@ const initDB = async (): Promise<void> => {
         } else {
             console.warn("⚠️ No database configuration found. Running in mock mode.");
         }
-    } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error("❌ Database initialization failed:", errorMessage);
-        pool = null; // Ensure we use fallback logic
+    } catch (error: any) {
+        console.error("❌ Database initialization failed:", error.message);
+        pool = null;
     }
 };
 
@@ -92,16 +89,14 @@ app.post("/api/form/submit", async (req: Request, res: Response) => {
             console.log("📝 Mock save (no DB):", { name, email, message });
             res.status(201).json({ success: true, message: "Form submitted successfully (mock mode)" });
         }
-    } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error("❌ Form submission error:", errorMessage);
-        res.status(500).json({ success: false, message: "Internal server error", error: errorMessage });
+    } catch (error: any) {
+        console.error("❌ Form submission error:", error.message);
+        res.status(500).json({ success: false, message: "Internal server error", error: error.message });
     }
 });
 
 // Serve React App in Production
-const __dirname = path.resolve();
-const buildPath = path.join(__dirname, "client/build");
+const buildPath = path.join(__dirname, "../../client/build");
 
 console.log(`🛠️ Mode: ${process.env.NODE_ENV || "not set"}`);
 console.log(`📂 Checking build path: ${buildPath}`);
@@ -116,27 +111,7 @@ app.get("/api/test", (req: Request, res: Response) => {
 
 // All other routes go to React app
 app.get("*", (req: Request, res: Response) => {
-    res.sendFile(path.join(buildPath, "index.html"), (err: Error | null) => {
-        if (err) {
-            console.error(`❌ Error sending index.html:`, err.message);
-            res.status(500).send(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Error - Portfolio</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-                        .error { color: #e74c3c; }
-                    </style>
-                </head>
-                <body>
-                    <h1 class="error">Error Loading Application</h1>
-                    <p>The client build folder might not exist or is corrupted.</p>
-                </body>
-                </html>
-            `);
-        }
-    });
+    res.sendFile(path.join(buildPath, "index.html"));
 });
 
 // Start Server
