@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mysql, { Pool } from "mysql2/promise";
@@ -103,10 +103,10 @@ app.get("/api/test", (req: Request, res: Response) => {
 });
 
 // Only serve React app for non-API routes
-app.get("*", (req: Request, res: Response) => {
+app.get("*", (req: Request, res: Response, next: NextFunction) => {
     // Don't handle API routes with React
     if (req.path.startsWith("/api/")) {
-        return res.status(404).json({ error: "API endpoint not found" });
+        return next(); // Pass to 404 handler
     }
     
     // For all other routes, serve React's index.html
@@ -132,6 +132,11 @@ app.get("*", (req: Request, res: Response) => {
             `);
         }
     });
+});
+
+// 404 handler for API routes
+app.use("/api/*", (req: Request, res: Response) => {
+    res.status(404).json({ error: "API endpoint not found" });
 });
 
 // Start Server
