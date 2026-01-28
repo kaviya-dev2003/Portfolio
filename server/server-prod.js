@@ -8,35 +8,41 @@ const app = express();
 
 // CORS for production
 app.use(cors({
-  origin: ["https://your-domain.up.railway.app", "http://localhost:3000"],
+  origin: ["https://portfolio-production-8b1b.up.railway.app", "http://localhost:3000"],
   credentials: true
 }));
 app.use(express.json());
 
 const PORT = process.env.PORT || 8080;
 
-// Parse Railway's MYSQL_URL
-// Format: mysql://user:password@host:port/database
-function parseMySQLUrl(url) {
-  if (!url) {
-    throw new Error("MYSQL_URL environment variable is not set");
-  }
+// Parse Railway's MYSQL_URL or use individual variables
+function parseMySQLConfig() {
+  const url = process.env.MYSQL_URL;
   
-  const match = url.match(/mysql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
-  if (!match) {
-    throw new Error("Invalid MYSQL_URL format");
+  if (url) {
+    const match = url.match(/mysql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
+    if (match) {
+      return {
+        host: match[3],
+        user: match[1],
+        password: match[2],
+        port: parseInt(match[4]),
+        database: match[5]
+      };
+    }
   }
-  
+
+  // Fallback to individual Railway variables
   return {
-    host: match[3],
-    user: match[1],
-    password: match[2],
-    port: parseInt(match[4]),
-    database: match[5]
+    host: process.env.MYSQLHOST || 'localhost',
+    user: process.env.MYSQLUSER || 'root',
+    password: process.env.MYSQLPASSWORD || '',
+    port: parseInt(process.env.MYSQLPORT || '3306'),
+    database: process.env.MYSQLDATABASE || 'railway'
   };
 }
 
-const dbConfig = parseMySQLUrl(process.env.MYSQL_URL);
+const dbConfig = parseMySQLConfig();
 
 const pool = mysql.createPool({
   host: dbConfig.host,

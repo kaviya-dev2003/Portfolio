@@ -135,10 +135,10 @@ const Contact: React.FC = () => {
     setStatus("loading");
 
     try {
-      console.log("📤 Sending to:", "http://localhost:5001/api/form/submit");
+      console.log("📤 Sending to:", "/api/form/submit");
       console.log("📤 Data:", formData);
 
-      const response = await fetch("http://localhost:5001/api/form/submit", {
+      const response = await fetch("/api/form/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

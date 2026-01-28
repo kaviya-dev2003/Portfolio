@@ -1,8 +1,8 @@
 {
   "build": {
     "builder": "nixpacks",
-    "buildCommand": "cd server && npm install",
-    "runCommand": "cd server && npm start"
+    "buildCommand": "npm install --prefix server",
+    "runCommand": "npm start --prefix server"
   },
   "deploy": {
     "startCommand": "node server/server-prod.js",
