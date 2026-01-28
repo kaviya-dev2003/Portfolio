@@ -1,9 +1,14 @@
 {
   "name": "portfolio-root",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "build": "cd client && npm install && npm run build && cd ../server && npm install && npm run build",
-    "start": "cd server && npm start"
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   },
   "engines": {
     "node": ">=18.0.0"
