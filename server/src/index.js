@@ -7,7 +7,8 @@ const path = require("path");
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;  // ← CHANGED TO 10000
+const HOST = '0.0.0.0';  // ← ADDED FOR RENDER
 
 // Middleware
 app.use(cors());
@@ -109,14 +110,7 @@ app.get("*", (req, res) => {
     res.sendFile(path.join(buildPath, "index.html"));
 });
 
-// Start Server
-app.listen(PORT, async () => {
-    await initDB();
-    console.log(`🚀 Server running on port ${PORT}`);
-});
-
-// Start Server with explicit host for Render
-const HOST = '0.0.0.0'; // Required for Render
+// Start Server with Render-compatible settings
 app.listen(PORT, HOST, async () => {
     await initDB();
     console.log(`🚀 Server running on http://${HOST}:${PORT}`);
