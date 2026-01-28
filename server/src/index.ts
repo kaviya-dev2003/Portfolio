@@ -1,11 +1,8 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import mysql, { Pool, PoolConnection } from "mysql2/promise";
+import mysql, { Pool, PoolConnection, PoolOptions } from "mysql2/promise";
 import path from "path";
-
-// For __dirname in TypeScript with ES modules
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 dotenv.config();
 
@@ -19,30 +16,34 @@ app.use(express.json());
 // Database Pool Setup (with fallback)
 let pool: Pool | null = null;
 
-interface DatabaseConfig {
-    host?: string;
-    user?: string;
-    password?: string;
-    database?: string;
-    port?: number;
-    uri?: string;
-    ssl?: { rejectUnauthorized: boolean };
-}
-
 const initDB = async (): Promise<void> => {
     try {
         if (process.env.MYSQL_URL || process.env.MYSQLHOST) {
-            const config: DatabaseConfig = process.env.MYSQL_URL 
-                ? { uri: process.env.MYSQL_URL }
-                : {
-                    host: process.env.MYSQLHOST,
-                    user: process.env.MYSQLUSER,
-                    password: process.env.MYSQLPASSWORD,
-                    database: process.env.MYSQLDATABASE,
-                    port: parseInt(process.env.MYSQLPORT || "3306"),
-                };
+            let config: PoolOptions;
             
-            config.ssl = { rejectUnauthorized: false };
+            if (process.env.MYSQL_URL) {
+                // For MYSQL_URL (Render MySQL), we need to parse the URL
+                const url = new URL(process.env.MYSQL_URL);
+                config = {
+                    host: url.hostname,
+                    user: url.username,
+                    password: url.password,
+                    database: url.pathname.slice(1), // Remove leading '/'
+                    port: parseInt(url.port) || 3306,
+                    ssl: { rejectUnauthorized: false }
+                };
+            } else {
+                // For individual environment variables
+                config = {
+                    host: process.env.MYSQLHOST!,
+                    user: process.env.MYSQLUSER!,
+                    password: process.env.MYSQLPASSWORD!,
+                    database: process.env.MYSQLDATABASE!,
+                    port: parseInt(process.env.MYSQLPORT || "3306"),
+                    ssl: { rejectUnauthorized: false }
+                };
+            }
+            
             pool = mysql.createPool(config);
             
             // Test connection and create table
@@ -69,31 +70,13 @@ const initDB = async (): Promise<void> => {
     }
 };
 
-interface HealthResponse {
-    status: string;
-    db: string;
-}
-
 // Health Check
-app.get("/api/health", (req: Request, res: Response<HealthResponse>): void => {
+app.get("/api/health", (req: Request, res: Response) => {
     res.status(200).json({ status: "ok", db: pool ? "connected" : "mock" });
 });
 
-interface FormData {
-    name: string;
-    email: string;
-    socialMedia?: string;
-    message: string;
-}
-
-interface FormResponse {
-    success: boolean;
-    message: string;
-    error?: string;
-}
-
 // Form Submission
-app.post("/api/form/submit", async (req: Request<{}, {}, FormData>, res: Response<FormResponse>): Promise<void> => {
+app.post("/api/form/submit", async (req: Request, res: Response) => {
     const { name, email, socialMedia, message } = req.body;
     
     console.log(`📩 Form submission received: ${email}`);
@@ -117,42 +100,23 @@ app.post("/api/form/submit", async (req: Request<{}, {}, FormData>, res: Respons
 });
 
 // Serve React App in Production
-const buildPath = path.join(__dirname, "../../client/build");
+const __dirname = path.resolve();
+const buildPath = path.join(__dirname, "client/build");
 
 console.log(`🛠️ Mode: ${process.env.NODE_ENV || "not set"}`);
 console.log(`📂 Checking build path: ${buildPath}`);
 
-// First, try to serve static files
-try {
-    app.use(express.static(buildPath));
-    console.log("✅ Static files middleware registered");
-} catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error("❌ Error setting up static files:", errorMessage);
-}
+// Serve static files from React build
+app.use(express.static(buildPath));
 
-// API routes should come before the catch-all route
-interface TestResponse {
-    message: string;
-}
-
-app.get("/api/test", (req: Request, res: Response<TestResponse>): void => {
+// API routes
+app.get("/api/test", (req: Request, res: Response) => {
     res.json({ message: "API is working" });
 });
 
-interface ApiErrorResponse {
-    error: string;
-}
-
-// Only serve React app for non-API routes
-app.get("*", (req: Request, res: Response, next: NextFunction): void => {
-    // Don't handle API routes with React
-    if (req.path.startsWith("/api/")) {
-        return next(); // Pass to 404 handler
-    }
-    
-    // For all other routes, serve React's index.html
-    res.sendFile(path.join(buildPath, "index.html"), (err: Error | null): void => {
+// All other routes go to React app
+app.get("*", (req: Request, res: Response) => {
+    res.sendFile(path.join(buildPath, "index.html"), (err: Error | null) => {
         if (err) {
             console.error(`❌ Error sending index.html:`, err.message);
             res.status(500).send(`
@@ -168,7 +132,6 @@ app.get("*", (req: Request, res: Response, next: NextFunction): void => {
                 <body>
                     <h1 class="error">Error Loading Application</h1>
                     <p>The client build folder might not exist or is corrupted.</p>
-                    <p>Build path: ${buildPath}</p>
                 </body>
                 </html>
             `);
@@ -176,13 +139,8 @@ app.get("*", (req: Request, res: Response, next: NextFunction): void => {
     });
 });
 
-// 404 handler for API routes
-app.use("/api/*", (req: Request, res: Response<ApiErrorResponse>): void => {
-    res.status(404).json({ error: "API endpoint not found" });
-});
-
 // Start Server
-app.listen(PORT, async (): Promise<void> => {
+app.listen(PORT, async () => {
     await initDB();
     console.log(`🚀 Server running on port ${PORT}`);
 });
