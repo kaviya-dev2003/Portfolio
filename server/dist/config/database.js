@@ -14,6 +14,7 @@ const envVars = {
     MYSQL_URL: process.env.MYSQL_URL ? "***SET***" : "NOT SET",
     MYSQLHOST: process.env.MYSQLHOST,
     MYSQLUSER: process.env.MYSQLUSER,
+    MYSQLPASSWORD: process.env.MYSQLPASSWORD ? "***SET***" : "NOT SET",
     MYSQLDATABASE: process.env.MYSQLDATABASE,
     MYSQLPORT: process.env.MYSQLPORT,
 };
